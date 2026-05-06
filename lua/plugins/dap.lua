@@ -86,7 +86,7 @@ return {
 				dependencies = { "williamboman/mason.nvim" },
 				opts = {
 					ensure_installed = { "python", "js", "codelldb" },
-					automatic_installation = true,
+					automatic_installation = false,
 					handlers = {},
 				},
 			},

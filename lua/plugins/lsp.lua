@@ -1,9 +1,10 @@
 return {
 	"neovim/nvim-lspconfig",
+	dependencies = {
+		"brayden/blink.cmp",
+	},
 	config = function()
-		local util = require("lspconfig.util")
-
-		-- IMPORTANTE: Obtener capabilities de blink.cmp para el autocompletado
+		local lspconfig = require("lspconfig")
 		local capabilities = require('blink.cmp').get_lsp_capabilities()
 
 		-- Configuración de diagnósticos
@@ -24,76 +25,44 @@ return {
 			severity_sort = true,
 		})
 
-		-- Configuración optimizada para TypeScript/React
-		vim.lsp.config("ts_ls", {
+		-- TypeScript/React
+		lspconfig.ts_ls.setup({
 			capabilities = capabilities,
-			root_dir = util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
-			settings = {
-				typescript = {
-					inlayHints = {
-						includeInlayParameterNameHints = "all",
-						includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-						includeInlayFunctionParameterTypeHints = true,
-						includeInlayVariableTypeHints = true,
-						includeInlayPropertyDeclarationTypeHints = true,
-						includeInlayFunctionLikeReturnTypeHints = true,
-						includeInlayEnumMemberValueHints = true,
-					},
-					suggest = {
-						completeFunctionCalls = true,
-					},
-				},
-				javascript = {
-					inlayHints = {
-						includeInlayParameterNameHints = "all",
-						includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-						includeInlayFunctionParameterTypeHints = true,
-						includeInlayVariableTypeHints = true,
-						includeInlayPropertyDeclarationTypeHints = true,
-						includeInlayFunctionLikeReturnTypeHints = true,
-						includeInlayEnumMemberValueHints = true,
-					},
-					suggest = {
-						completeFunctionCalls = true,
-					},
+			init_options = {
+				preferences = {
+					includeInlayParameterNameHints = "all",
+					includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+					includeInlayFunctionParameterTypeHints = true,
+					includeInlayVariableTypeHints = true,
+					includeInlayPropertyDeclarationTypeHints = true,
+					includeInlayFunctionLikeReturnTypeHints = true,
+					includeInlayEnumMemberValueHints = true,
 				},
 			},
 		})
 
-		-- Configuración para emmet en JSX/TSX
-		vim.lsp.config("emmet_language_server", {
+		-- Emmet para JSX/TSX
+		lspconfig.emmet_language_server.setup({
 			capabilities = capabilities,
 			filetypes = {
-				"css",
-				"html",
-				"javascript",
-				"javascriptreact",
-				"typescript",
-				"typescriptreact",
+				"css", "html", "javascript", "javascriptreact",
+				"typescript", "typescriptreact",
 			},
 		})
 
-		-- Configuración para CSS
-		vim.lsp.config("cssls", {
+		-- CSS
+		lspconfig.cssls.setup({
 			capabilities = capabilities,
 		})
 
-		-- Configuración para HTML
-		vim.lsp.config("html", {
+		-- HTML
+		lspconfig.html.setup({
 			capabilities = capabilities,
 		})
 
-		-- Configuración para pylsp: usa .venv si existe en el root del proyecto
-		vim.lsp.config("pylsp", {
+		-- Python
+		lspconfig.pylsp.setup({
 			capabilities = capabilities,
-			root_dir = util.root_pattern("pyproject.toml", "setup.cfg", "setup.py", "requirements.txt", ".git"),
-			cmd = { "pylsp" },
-			on_new_config = function(new_config, root_dir)
-				local venv_pylsp = root_dir .. "/.venv/bin/pylsp"
-				if vim.fn.executable(venv_pylsp) == 1 then
-					new_config.cmd = { venv_pylsp }
-				end
-			end,
 			settings = {
 				pylsp = {
 					plugins = {
@@ -105,31 +74,19 @@ return {
 			},
 		})
 
-		-- Configuración para Astro
-		vim.lsp.config("astro", {
+		-- Astro
+		lspconfig.astro.setup({
 			capabilities = capabilities,
 		})
 
-		-- Configuración para SQL
-		vim.lsp.config("sqlls", {
+		-- SQL
+		lspconfig.sqlls.setup({
 			capabilities = capabilities,
 		})
 
-		-- Configuración para Markdown
-		vim.lsp.config("markdown_oxide", {
+		-- Markdown
+		lspconfig.markdown_oxide.setup({
 			capabilities = capabilities,
-		})
-
-		-- Habilita todos los servidores
-		vim.lsp.enable({
-			"ts_ls",
-			"pylsp",
-			"astro",
-			"cssls",
-			"html",
-			"emmet_language_server",
-			"sqlls",
-			"markdown_oxide",
 		})
 	end,
 }
