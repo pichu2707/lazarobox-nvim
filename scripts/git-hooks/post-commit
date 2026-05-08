@@ -1,0 +1,47 @@
+#!/bin/bash
+set -e
+
+MSG=$(git log -1 --pretty=%B)
+
+# Evitar loop: no bumpear el propio commit de bump
+if echo "$MSG" | grep -qE "^bump\(version\):"; then
+	exit 0
+fi
+
+# Detectar tipo de bump
+if echo "$MSG" | grep -qiE "^(fix|perf|revert)[(!]"; then
+	TYPE="patch"
+elif echo "$MSG" | grep -qiE "^feat[(!]"; then
+	TYPE="minor"
+elif echo "$MSG" | grep -qiE "BREAKING CHANGE"; then
+	TYPE="major"
+else
+	exit 0
+fi
+
+# Leer versión actual
+CURRENT=$(cat VERSION)
+IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT"
+
+case "$TYPE" in
+patch)
+	PATCH=$((PATCH + 1))
+	;;
+minor)
+	MINOR=$((MINOR + 1))
+	PATCH=0
+	;;
+major)
+	MAJOR=$((MAJOR + 1))
+	MINOR=0
+	PATCH=0
+	;;
+esac
+
+NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+echo "$NEW_VERSION" >VERSION
+git add VERSION
+
+# Usamos --no-verify para no disparar hooks en este commit interno
+git commit --no-verify -m "bump(version): v$NEW_VERSION"
+git tag -a "v$NEW_VERSION" -m "v$NEW_VERSION"

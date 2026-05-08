@@ -81,7 +81,16 @@ return {
 					{ "diagnostics", symbols = { error = " ", warn = " ", info = " ", hint = "󰌵 " } },
 				},
 				lualine_c = { { "filename", path = 1, symbols = { modified = " ●", readonly = " " } } },
-				lualine_x = { "encoding", "fileformat", "filetype" },
+				lualine_x = {
+					{
+						require("config.version").get,
+						icon = "󰃃 ",
+						color = { fg = colors.normal },
+					},
+					"encoding",
+					"fileformat",
+					"filetype",
+				},
 				lualine_y = { "progress" },
 				lualine_z = { { "location", icon = "" } },
 			},

@@ -2,6 +2,7 @@ require("config/options")
 require("config/keymaps")
 require("config.lazy")
 require("config.media-autocmds")
+require("config.version").setup()
 vim.opt.clipboard = "unnamedplus"
 
 -- Forzar uso de xclip en X11
