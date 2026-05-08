@@ -3,17 +3,19 @@ return {
 	dependencies = {
 		"3rd/image.nvim",
 	},
-	opts = {
-		integrations = {
-			require("diagram.integrations.markdown"),
-		},
-		renderer_options = {
-			mermaid = {
-				theme = "default",
-				scale = 1,
+	opts = function()
+		return {
+			integrations = {
+				require("diagram.integrations.markdown"),
 			},
-		},
-	},
+			renderer_options = {
+				mermaid = {
+					theme = "default",
+					scale = 1,
+				},
+			},
+		}
+	end,
 	keys = {
 		{
 			"K",
