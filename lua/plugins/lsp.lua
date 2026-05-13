@@ -74,9 +74,21 @@ return {
 			},
 		})
 
-		-- Astro
+		-- Astro con protección contra crashes
 		lspconfig.astro.setup({
 			capabilities = capabilities,
+			-- Solo activar en proyectos que realmente usan Astro
+			root_dir = function(fname)
+				return lspconfig.util.root_pattern('astro.config.mjs', 'astro.config.js', 'astro.config.ts')(fname)
+			end,
+			-- Configurar manejo de errores
+			on_attach = function(client, bufnr)
+				-- Si el LSP crashea, no reintentar automáticamente
+				if client.is_stopped() then
+					print("Astro LSP stopped due to error - check :messages")
+					return
+				end
+			end,
 		})
 
 		-- SQL

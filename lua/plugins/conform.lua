@@ -81,7 +81,7 @@ return {
 		end, { desc = "Format with Biome only" })
 
 		-- Formatear solo con Prettier
-		vim.keymap.set("n", "<leader>mp", function()
+		vim.keymap.set("n", "<leader>mP", function()
 			conform.format({ formatters = { "prettier" } })
 		end, { desc = "Format with Prettier only" })
 	end,

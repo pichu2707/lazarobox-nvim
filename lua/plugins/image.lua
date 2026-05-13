@@ -17,7 +17,7 @@ return {
 				filetypes = { "markdown", "vimwiki" },
 			},
 			neorg = {
-				enabled = true,
+				enabled = false, -- Deshabilitado temporalmente por problemas con norg_meta parser
 				clear_in_insert_mode = false,
 				download_remote_images = true,
 				only_render_image_at_cursor = false,

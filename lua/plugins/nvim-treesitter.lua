@@ -6,7 +6,7 @@ return {
 			ensure_installed = {
 				"lua", "vim", "vimdoc", "query", "markdown", "markdown_inline",
 				"bash", "javascript", "typescript", "tsx", "json", "python",
-				"html", "css", "sql"
+				"html", "css", "sql", "norg"
 			},
 			sync_install = false,
 			auto_install = true,

@@ -1,6 +1,7 @@
 return {
-  'neovim/nvim-lspconfig',
-  dependencies = { 'williamboman/mason.nvim', 'williamboman/mason-lspconfig.nvim' },
+  -- Plugin separado para configuración específica de Biome
+  "williamboman/mason.nvim", -- Solo depende de mason, no duplica lspconfig
+  dependencies = { 'williamboman/mason-lspconfig.nvim' },
   config = function()
     -- Configuración específica para Biome LSP
     local lspconfig = require('lspconfig')
