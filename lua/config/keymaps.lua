@@ -38,17 +38,113 @@ vim.keymap.set("n", "<C-j>", "<C-w>j", { noremap = true, silent = true, desc = "
 vim.keymap.set("n", "<C-k>", "<C-w>k", { noremap = true, silent = true, desc = "Move to top window" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { noremap = true, silent = true, desc = "Move to right window" })
 
+-- Code configured
+vim.keymap.set("n", "K", vim.lsp.buf.hover, {
+	desc = "LSP Hover documentation",
+})
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, {
+	desc = "Go to definition",
+})
+
+vim.keymap.set("n", "gr", vim.lsp.buf.references, {
+	desc = "Find references",
+})
+
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {
+	desc = "Rename symbol",
+})
+
+vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {
+	desc = "Code action",
+})
+
 -- Run file based on filetype
+local function get_rust_project_root(file)
+	local cargo_toml = vim.fs.find("Cargo.toml", { path = vim.fn.fnamemodify(file, ":h"), upward = true })[1]
+	if not cargo_toml then
+		return nil
+	end
+
+	return vim.fn.fnamemodify(cargo_toml, ":h")
+end
+
+local function cargo_bin_target_for_file(project_root, file)
+	local metadata_output = vim.fn.systemlist(
+		"cd " .. vim.fn.shellescape(project_root) .. " && cargo metadata --no-deps --format-version 1"
+	)
+	if vim.v.shell_error ~= 0 then
+		return nil
+	end
+
+	local ok, metadata = pcall(vim.json.decode, table.concat(metadata_output, "\n"))
+	if not ok or not metadata or not metadata.packages then
+		return nil
+	end
+
+	local normalized_file = file:gsub("\\", "/")
+
+	for _, package in ipairs(metadata.packages) do
+		for _, target in ipairs(package.targets or {}) do
+			local is_bin = vim.tbl_contains(target.kind or {}, "bin")
+			local src_path = target.src_path and target.src_path:gsub("\\", "/")
+			if is_bin and src_path == normalized_file then
+				return target.name
+			end
+		end
+	end
+
+	return nil
+end
+
+local function get_rust_run_command(file)
+	local crate_name = vim.fn.expand("%:t:r"):gsub("^%s+", ""):gsub("%s+$", ""):gsub("[^%w_]", "_")
+	local project_root = get_rust_project_root(file)
+	if not project_root then
+		local output = vim.fn.expand("%:p:r")
+		return "rustc --crate-name "
+			.. vim.fn.shellescape(crate_name)
+			.. " "
+			.. vim.fn.shellescape(file)
+			.. " -o "
+			.. vim.fn.shellescape(output)
+			.. " && "
+			.. vim.fn.shellescape(output),
+			nil
+	end
+
+	local bin_name = cargo_bin_target_for_file(project_root, file)
+	if bin_name then
+		return "cargo run --bin " .. vim.fn.shellescape(bin_name), project_root
+	end
+
+	local output = vim.fn.expand("%:p:r")
+	vim.notify("No Cargo bin target found for this file; running it with rustc instead.", vim.log.levels.WARN)
+	return "rustc --crate-name "
+		.. vim.fn.shellescape(crate_name)
+		.. " "
+		.. vim.fn.shellescape(file)
+		.. " -o "
+		.. vim.fn.shellescape(output)
+		.. " && "
+		.. vim.fn.shellescape(output),
+		nil
+end
+
 local function run_current_file()
 	local ft = vim.bo.filetype
-	local file = vim.fn.expand("%")
+	local file = vim.fn.expand("%:p")
+
+	if vim.fn.filereadable(file) == 0 then
+		print("Not a readable file: " .. file)
+		return
+	end
 
 	if ft == "python" then
 		vim.cmd("!python3 " .. file)
 	elseif ft == "javascript" then
 		vim.cmd("!node " .. file)
 	elseif ft == "typescript" then
-		vim.cmd("!ts-node " .. file)
+		vim.cmd("!tsx " .. file)
 	elseif ft == "sql" then
 		vim.ui.input({ prompt = "Database file: " }, function(db)
 			if db then
@@ -63,13 +159,22 @@ local function run_current_file()
 		local filename = vim.fn.expand("%:t:r") -- nombre sin extensión
 		vim.cmd("!javac " .. file .. " && java " .. filename)
 	elseif ft == "rust" then
-		-- Si existe Cargo.toml, usar cargo run; si no, compilar directamente
-		if vim.fn.filereadable("Cargo.toml") == 1 then
-			vim.cmd("!cargo run")
-		else
-			local output = vim.fn.expand("%:r")
-			vim.cmd("!rustc " .. file .. " -o " .. output .. " && ./" .. output)
+		local cmd, project_root, err = get_rust_run_command(file)
+		if not cmd then
+			vim.notify(err or "Could not build Rust run command", vim.log.levels.ERROR)
+			return
 		end
+		local previous_cwd = vim.fn.getcwd()
+		if project_root then
+			vim.cmd("lcd " .. vim.fn.fnameescape(project_root))
+		end
+		vim.cmd("!" .. cmd)
+		if project_root then
+			vim.cmd("lcd " .. vim.fn.fnameescape(previous_cwd))
+		end
+	elseif ft == "html" then
+		vim.fn.jobstart({ "xdg-open", file }, { detach = true })
+		vim.notify("Opening in browser: " .. vim.fn.expand("%:t"), vim.log.levels.INFO)
 	else
 		print("No run command configured for filetype: " .. ft)
 	end
@@ -83,12 +188,17 @@ local function run_in_toggleterm()
 	local file = vim.fn.expand("%:p")
 	local cmd = ""
 
+	if vim.fn.filereadable(file) == 0 then
+		print("Not a readable file: " .. file)
+		return
+	end
+
 	if ft == "python" then
 		cmd = 'python3 "' .. file .. '"'
 	elseif ft == "javascript" then
 		cmd = 'node "' .. file .. '"'
 	elseif ft == "typescript" then
-		cmd = 'ts-node "' .. file .. '"'
+		cmd = 'tsx "' .. file .. '"'
 	elseif ft == "lua" then
 		cmd = 'lua "' .. file .. '"'
 	elseif ft == "sh" or ft == "bash" then
@@ -98,12 +208,16 @@ local function run_in_toggleterm()
 		local filename = vim.fn.expand("%:t:r")
 		cmd = 'cd "' .. dir .. '" && javac "' .. vim.fn.expand("%:t") .. '" && java ' .. filename
 	elseif ft == "rust" then
-		local dir = vim.fn.expand("%:p:h")
-		if vim.fn.filereadable("Cargo.toml") == 1 then
-			cmd = "cargo run"
+		local rust_cmd, project_root, err = get_rust_run_command(file)
+		if not rust_cmd then
+			vim.notify(err or "Could not build Rust run command", vim.log.levels.ERROR)
+			return
+		end
+		if project_root then
+			cmd = 'cd ' .. vim.fn.shellescape(project_root) .. ' && ' .. rust_cmd
 		else
-			local output = vim.fn.expand("%:t:r")
-			cmd = 'cd "' .. dir .. '" && rustc "' .. vim.fn.expand("%:t") .. '" -o ' .. output .. " && ./" .. output
+			local dir = vim.fn.expand("%:p:h")
+			cmd = 'cd ' .. vim.fn.shellescape(dir) .. ' && ' .. rust_cmd
 		end
 	else
 		print("No run command configured for filetype: " .. ft)

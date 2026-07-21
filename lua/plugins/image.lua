@@ -1,6 +1,6 @@
 return {
 	"3rd/image.nvim",
-	-- Requiere: WezTerm y ImageMagick (`sudo apt install imagemagick`)
+	-- Requiere: Kitty y ImageMagick (`sudo apt install imagemagick`)
 	event = "VeryLazy",
 	dependencies = {
 		"nvim-treesitter/nvim-treesitter",

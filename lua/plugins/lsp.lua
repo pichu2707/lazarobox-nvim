@@ -5,7 +5,7 @@ return {
 	},
 	config = function()
 		local lspconfig = require("lspconfig")
-		local capabilities = require('blink.cmp').get_lsp_capabilities()
+		local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 		-- Configuración de diagnósticos
 		vim.diagnostic.config({
@@ -45,8 +45,12 @@ return {
 		lspconfig.emmet_language_server.setup({
 			capabilities = capabilities,
 			filetypes = {
-				"css", "html", "javascript", "javascriptreact",
-				"typescript", "typescriptreact",
+				"css",
+				"html",
+				"javascript",
+				"javascriptreact",
+				"typescript",
+				"typescriptreact",
 			},
 		})
 
@@ -79,7 +83,7 @@ return {
 			capabilities = capabilities,
 			-- Solo activar en proyectos que realmente usan Astro
 			root_dir = function(fname)
-				return lspconfig.util.root_pattern('astro.config.mjs', 'astro.config.js', 'astro.config.ts')(fname)
+				return lspconfig.util.root_pattern("astro.config.mjs", "astro.config.js", "astro.config.ts")(fname)
 			end,
 			-- Configurar manejo de errores
 			on_attach = function(client, bufnr)

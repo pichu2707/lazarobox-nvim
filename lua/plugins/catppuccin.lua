@@ -72,15 +72,15 @@ return {
 					surface1 = "#232A36", -- surface1
 					surface2 = "#2A3142", -- surface2
 
-					-- Text
-					text = "#F3F6F9", -- fg
-					subtext1 = "#00FFFF", -- bright_black / fg_placeholder
-					subtext0 = "#5C6170", -- gray5 / fg_muted
+				-- Text
+				text = "#F3F6F9", -- fg
+				subtext1 = "#00FFFF", -- bright_black / fg_placeholder
+				subtext0 = "#8892A4", -- gray5 / fg_muted — raised for contrast on dark bg
 
-					-- Overlays (selection, inactive text, borders)
-					overlay2 = "#5C6170", -- gray5
-					overlay1 = "#313342", -- gray3
-					overlay0 = "#27345C", -- gray4
+				-- Overlays (selection, inactive text, borders)
+				overlay2 = "#8892A4", -- gray5 — raised for contrast on dark bg
+				overlay1 = "#5A6480", -- gray3 — raised for contrast on dark bg
+				overlay0 = "#3D4F7A", -- gray4 — raised for contrast on dark bg
 
 					-- Accent colors (syntax)
 					red = "#CB7C94", -- constant / embedded
@@ -94,7 +94,7 @@ return {
 					green = "#B7CC85", -- green
 					yellow = "#FFE066", -- yellow / warnings
 					peach = "#DEBA87", -- operator / orange
-					lavender = "#263356", -- selection bg
+					lavender = "#B4BEFE", -- identifiers / selection highlight — original Catppuccin Mocha lavender
 					rosewater = "#E0C15A", -- accent (gold)
 				},
 			},

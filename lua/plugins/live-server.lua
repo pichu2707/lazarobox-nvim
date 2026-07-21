@@ -7,9 +7,9 @@ return {
 			"<leader>Ls",
 			function()
 				vim.cmd("LiveServerStart")
-				-- Espera un momento y abre el navegador en Windows/WSL
+				-- Wait for server to be ready, then open browser (Linux)
 				vim.defer_fn(function()
-					vim.fn.jobstart({ "explorer.exe", "http://localhost:5500" }, { detach = true })
+					vim.fn.jobstart({ "xdg-open", "http://localhost:5500" }, { detach = true })
 				end, 500)
 			end,
 			desc = "Start live server + open browser",
