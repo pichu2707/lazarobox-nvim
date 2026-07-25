@@ -389,9 +389,39 @@ return {
 
 ---
 
+## Iconos y Nerd Font
+
+La fuente oficial de LazaroBox es **JetBrainsMono Nerd Font**. No hace falta instalarla
+a mano: el instalador del repositorio la descarga y la registra en el sistema.
+
+```bash
+./install.sh --fonts-only     # Linux, macOS, WSL
+.\install.ps1 -FontsOnly      # Windows
+```
+
+Despues, selecciona `JetBrainsMono Nerd Font` en los ajustes de tu terminal y reinicialo.
+
+### Si ves cajas o interrogantes en lugar de iconos
+
+Ejecuta `:checkhealth lazarobox`. Diagnostica la fuente, las herramientas externas y el
+portapapeles, e indica que falta en cada caso.
+
+Las causas habituales, por orden de frecuencia:
+
+| Sintoma | Causa | Solucion |
+| --- | --- | --- |
+| Cajas en todos los iconos | El terminal no usa una Nerd Font | Cambia la fuente en los ajustes del terminal |
+| La fuente esta instalada pero no aparece en la lista del terminal | El terminal se abrio antes de instalarla | Reinicia el terminal |
+| Descargaste el `.ttf` y sigue sin funcionar (Linux) | Falta regenerar el indice de fuentes | `fc-cache -f` |
+| Cajas solo en WSL | La fuente se instalo dentro de la distro | El terminal lo dibuja Windows: instalala en el host con `./install.sh --fonts-only` |
+
+Detalle de por que copiar un `.ttf` no equivale a instalarlo, en el README del repositorio.
+
+---
+
 ## Recursos Utiles
 
 - [Documentacion de Lazy.nvim](https://github.com/folke/lazy.nvim)
 - [Documentacion de Snacks.nvim](https://github.com/folke/snacks.nvim)
 - [Awesome Neovim](https://github.com/rockerBOO/awesome-neovim)
-- [Nerd Fonts](https://www.nerdfonts.com/) - Para iconos
+- [Nerd Fonts](https://www.nerdfonts.com/) - Catalogo de fuentes con iconos
