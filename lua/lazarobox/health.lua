@@ -69,14 +69,11 @@ local TOOLS = {
 		pkg = { default = "imagemagick", dnf = "ImageMagick", zypper = "ImageMagick" },
 	},
 	{
-		cmd = "chafa",
-		why = "logo del dashboard",
-		pkg = { default = "chafa" },
-	},
-	{
 		-- No esta en los repositorios de ninguna distro: va por npm global.
+		-- Lo usa diagram.nvim para renderizar bloques mermaid (tecla K en
+		-- markdown) y version.lua lo muestra en la pantalla de version.
 		cmd = "mmdc",
-		why = "diagramas mermaid (diagram.nvim)",
+		why = "renderizar mermaid con K en markdown (diagram.nvim)",
 		npm = "@mermaid-js/mermaid-cli",
 	},
 	{

@@ -213,8 +213,12 @@ resolve_repo() {
 #   make + compilador C  -> nvim-treesitter (:TSUpdate) y telescope-fzf-native
 #   ripgrep / fd         -> telescope y snacks.picker
 #   imagemagick (magick) -> image.nvim con processor = magick_cli
-#   chafa                -> logo del dashboard
 #   node + npm           -> live-server, copilot, claudecode, mermaid-cli
+#
+# chafa NO es dependencia del config: la cabecera del dashboard es arte ASCII
+# incrustado en snacks.lua y las imagenes van por image.nvim con magick. Se
+# instala solo por comodidad, para el ejemplo de dashboard con imagen de
+# GUIA_NVIM.md, y por eso no se reporta como ausente en el resumen.
 #   xclip / wl-clipboard -> portapapeles en X11 / Wayland
 #   win32yank.exe        -> portapapeles en WSL
 # ------------------------------------------------------------------------------
@@ -644,7 +648,6 @@ summary() {
 		has "$tool" || missing+=("$tool")
 	done
 	has magick || has convert || missing+=("imagemagick")
-	has chafa || missing+=("chafa")
 	has mmdc || missing+=("mmdc")
 
 	if [[ ${#missing[@]} -eq 0 ]]; then
