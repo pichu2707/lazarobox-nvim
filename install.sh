@@ -656,6 +656,14 @@ summary() {
 		warn "Faltan (opcionales, degradan funciones): ${missing[*]}"
 	fi
 
+	if ! has rustup; then
+		warn "Rust diagnostics: instala rustup desde https://rustup.rs"
+	elif ! has rust-analyzer || ! has cargo-clippy; then
+		warn "Rust diagnostics: ejecuta 'rustup component add rust-analyzer clippy'"
+	else
+		ok "Rust diagnostics listos (rust-analyzer + clippy via rustup)"
+	fi
+
 	# Debian y Ubuntu LTS empaquetan versiones de node antiguas; copilot y
 	# claudecode necesitan una moderna. Avisamos en vez de romper en silencio.
 	if has node; then

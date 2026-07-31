@@ -12,6 +12,7 @@ return {
 			virtual_text = {
 				prefix = "●",
 				source = "if_many",
+				severity = { min = vim.diagnostic.severity.WARN },
 			},
 			float = {
 				source = "always",
@@ -21,7 +22,7 @@ return {
 			},
 			signs = true,
 			underline = true,
-			update_in_insert = false,
+			update_in_insert = true,
 			severity_sort = true,
 		})
 

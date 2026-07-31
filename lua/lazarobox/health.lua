@@ -111,6 +111,10 @@ local function is_macos()
 	return vim.fn.has("mac") == 1
 end
 
+local function is_windows()
+	return vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1
+end
+
 -- Detecta el gestor de paquetes de ESTA maquina, con el mismo criterio que
 -- install.sh: brew solo en macOS, el resto solo en Linux. El resultado se cachea
 -- porque `executable()` es una llamada al sistema y aqui se consulta por cada
@@ -325,6 +329,56 @@ local function check_tools()
 end
 
 -- ---------------------------------------------------------------------------
+-- Rust
+-- ---------------------------------------------------------------------------
+
+local function rustup_install_advice()
+	if is_windows() then
+		return {
+			"winget install Rustlang.Rustup",
+			"Reinicia la terminal para que PATH incluya rustup/cargo",
+		}
+	end
+
+	return {
+		"curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh",
+		"Reinicia la terminal o ejecuta: source ~/.cargo/env",
+	}
+end
+
+local function check_rust()
+	health.start("Rust")
+
+	if has("rustup") then
+		health.ok("rustup — toolchain manager para Rust")
+	else
+		health.warn(
+			"rustup no encontrado — rustaceanvim espera herramientas del toolchain activo",
+			rustup_install_advice()
+		)
+		return
+	end
+
+	if has("rust-analyzer") then
+		health.ok("rust-analyzer — servidor LSP de Rust")
+	else
+		health.warn("rust-analyzer no encontrado", {
+			"rustup component add rust-analyzer",
+			"No lo instales con Mason: debe coincidir con el toolchain activo de rustup",
+		})
+	end
+
+	if has("cargo-clippy") then
+		health.ok("clippy — diagnosticos extra para rust-analyzer")
+	else
+		health.warn("clippy no encontrado", {
+			"rustup component add clippy",
+			"rust-analyzer lo usara mediante check.command = 'clippy'",
+		})
+	end
+end
+
+-- ---------------------------------------------------------------------------
 -- Portapapeles
 --
 -- init.lua y lua/config/options.lua eligen proveedor segun el entorno, asi que
@@ -398,6 +452,7 @@ function M.check()
 	check_neovim()
 	check_font()
 	check_tools()
+	check_rust()
 	check_clipboard()
 	check_config()
 end

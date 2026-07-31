@@ -400,6 +400,16 @@ function Write-Summary {
         Write-Info 'Algunas solo apareceran tras reiniciar la terminal (PATH)'
     }
 
+    if (-not (Test-Command rustup)) {
+        Write-Warn 'Rust diagnostics: instala rustup con: winget install Rustlang.Rustup'
+    }
+    elseif (-not (Test-Command rust-analyzer) -or -not (Test-Command cargo-clippy)) {
+        Write-Warn 'Rust diagnostics: ejecuta rustup component add rust-analyzer clippy'
+    }
+    else {
+        Write-Ok 'Rust diagnostics listos (rust-analyzer + clippy via rustup)'
+    }
+
     if (Test-FontInstalled) { Write-Ok "$FontFamily registrada" }
     else { Write-Warn "$FontFamily no aparece registrada" }
 
