@@ -1,17 +1,17 @@
 -- Buffer navigation (legacy - BufferLine also provides <Tab>/<S-Tab>)
-vim.keymap.set("n", "gb", ":bn<CR>", { noremap = true, silent = true })
-vim.keymap.set("n", "gB", ":bp<CR>", { noremap = true, silent = true })
+vim.keymap.set("n", "gb", ":bn<CR>", { noremap = true, silent = true, desc = "Next buffer" })
+vim.keymap.set("n", "gB", ":bp<CR>", { noremap = true, silent = true, desc = "Previous buffer" })
 -- Terminal manejado por toggleterm.nvim plugin
-vim.keymap.set("n", "<leader>ac", "<cmd>ClaudeCode<cr>", { desc = "Toggle Claude" })
-vim.keymap.set("v", "<leader>as", "<cmd>ClaudeCodeSend<cr>", { desc = "Send to Claude" })
+vim.keymap.set("n", "<leader>ac", "<cmd>ClaudeCode<cr>", { desc = "AI: Toggle Claude" })
+vim.keymap.set("v", "<leader>as", "<cmd>ClaudeCodeSend<cr>", { desc = "AI: Send selection to Claude" })
 
 -- Avante (Ollama AI)
-vim.keymap.set("n", "<leader>aa", "<cmd>AvanteAsk<cr>", { desc = "Avante: Ask AI" })
-vim.keymap.set("v", "<leader>aa", "<cmd>AvanteAsk<cr>", { desc = "Avante: Ask about selection" })
-vim.keymap.set("n", "<leader>at", "<cmd>AvanteToggle<cr>", { desc = "Avante: Toggle sidebar" })
-vim.keymap.set("v", "<leader>ae", "<cmd>AvanteEdit<cr>", { desc = "Avante: Edit selection" })
-vim.keymap.set("n", "<leader>ar", "<cmd>AvanteRefresh<cr>", { desc = "Avante: Refresh" })
-vim.keymap.set("n", "<leader>af", "<cmd>AvanteFocus<cr>", { desc = "Avante: Focus sidebar" })
+vim.keymap.set("n", "<leader>aa", "<cmd>AvanteAsk<cr>", { desc = "AI: Ask Avante" })
+vim.keymap.set("v", "<leader>aa", "<cmd>AvanteAsk<cr>", { desc = "AI: Ask Avante about selection" })
+vim.keymap.set("n", "<leader>at", "<cmd>AvanteToggle<cr>", { desc = "AI: Toggle Avante sidebar" })
+vim.keymap.set("v", "<leader>ae", "<cmd>AvanteEdit<cr>", { desc = "AI: Edit selection with Avante" })
+vim.keymap.set("n", "<leader>ar", "<cmd>AvanteRefresh<cr>", { desc = "AI: Refresh Avante" })
+vim.keymap.set("n", "<leader>af", "<cmd>AvanteFocus<cr>", { desc = "AI: Focus Avante sidebar" })
 
 -- Mover líneas de arriba/abajo (Modo Normal)
 vim.keymap.set("n", "<A-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Bajar una línea el código" })
@@ -22,15 +22,15 @@ vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Subir bloque seleccionado" })
 
 -- Clipboard system integration
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
-vim.keymap.set("n", "<leader>Y", '"+Y', { desc = "Copy line to system clipboard" })
-vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Paste from system clipboard" })
-vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', { desc = "Paste before from system clipboard" })
+vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Clipboard: Copy" })
+vim.keymap.set("n", "<leader>Y", '"+Y', { desc = "Clipboard: Copy line" })
+vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Clipboard: Paste after" })
+vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', { desc = "Clipboard: Paste before" })
 
 -- Split windows
-vim.keymap.set("n", "<leader>wv", ":vsplit<CR>", { noremap = true, silent = true, desc = "Split vertical" })
-vim.keymap.set("n", "<leader>wh", ":split<CR>", { noremap = true, silent = true, desc = "Split horizontal" })
-vim.keymap.set("n", "<leader>wq", ":q<CR>", { noremap = true, silent = true, desc = "Close window" })
+vim.keymap.set("n", "<leader>wv", ":vsplit<CR>", { noremap = true, silent = true, desc = "Window: Split vertical" })
+vim.keymap.set("n", "<leader>wh", ":split<CR>", { noremap = true, silent = true, desc = "Window: Split horizontal" })
+vim.keymap.set("n", "<leader>wq", ":q<CR>", { noremap = true, silent = true, desc = "Window: Close" })
 
 -- Navigate windows
 vim.keymap.set("n", "<C-h>", "<C-w>h", { noremap = true, silent = true, desc = "Move to left window" })
@@ -180,7 +180,7 @@ local function run_current_file()
 	end
 end
 
-vim.keymap.set("n", "<leader>x", run_current_file, { desc = "Execute current file" })
+vim.keymap.set("n", "<leader>x", run_current_file, { desc = "Execute file inline" })
 
 -- Quick run with toggleterm (keeps terminal open)
 local function run_in_toggleterm()
@@ -256,13 +256,13 @@ vim.keymap.set("n", "<leader>ip", function()
 	else
 		vim.fn.jobstart({ "xdg-open", path }, { detach = true })
 	end
-end, { desc = "Preview image under cursor" })
+end, { desc = "Image: Preview under cursor" })
 
 -- LSP Diagnostics keymaps
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show error details" })
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "List all diagnostics" })
+vim.keymap.set("n", "<leader>ld", vim.diagnostic.open_float, { desc = "LSP: Show diagnostic details" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "LSP: Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "LSP: Next diagnostic" })
+vim.keymap.set("n", "<leader>lq", vim.diagnostic.setloclist, { desc = "LSP: List diagnostics" })
 
 -- Vite dev server in split terminal
 vim.keymap.set("n", "<leader>vd", function()
@@ -274,14 +274,14 @@ vim.keymap.set("n", "<leader>vd", function()
 		auto_scroll = true,
 	})
 	vite_dev:toggle()
-end, { desc = "Start Vite dev server (split)" })
+end, { desc = "Terminal: Start Vite dev server" })
 
 -- Buffer navigation (Tab/S-Tab)
 vim.keymap.set("n", "<Tab>", ":bnext<CR>", { noremap = true, silent = true, desc = "Next buffer" })
 vim.keymap.set("n", "<S-Tab>", ":bprevious<CR>", { noremap = true, silent = true, desc = "Previous buffer" })
-vim.keymap.set("n", "<leader>bc", ":bdelete<CR>", { noremap = true, silent = true, desc = "Close buffer" })
-vim.keymap.set("n", "<leader>1", "<cmd>LualineBuffersJump 1<CR>", { desc = "Go to buffer 1" })
-vim.keymap.set("n", "<leader>2", "<cmd>LualineBuffersJump 2<CR>", { desc = "Go to buffer 2" })
-vim.keymap.set("n", "<leader>3", "<cmd>LualineBuffersJump 3<CR>", { desc = "Go to buffer 3" })
-vim.keymap.set("n", "<leader>4", "<cmd>LualineBuffersJump 4<CR>", { desc = "Go to buffer 4" })
-vim.keymap.set("n", "<leader>5", "<cmd>LualineBuffersJump 5<CR>", { desc = "Go to buffer 5" })
+vim.keymap.set("n", "<leader>bc", ":bdelete<CR>", { noremap = true, silent = true, desc = "Buffer: Close" })
+vim.keymap.set("n", "<leader>b1", "<cmd>LualineBuffersJump 1<CR>", { desc = "Buffer: Go to 1" })
+vim.keymap.set("n", "<leader>b2", "<cmd>LualineBuffersJump 2<CR>", { desc = "Buffer: Go to 2" })
+vim.keymap.set("n", "<leader>b3", "<cmd>LualineBuffersJump 3<CR>", { desc = "Buffer: Go to 3" })
+vim.keymap.set("n", "<leader>b4", "<cmd>LualineBuffersJump 4<CR>", { desc = "Buffer: Go to 4" })
+vim.keymap.set("n", "<leader>b5", "<cmd>LualineBuffersJump 5<CR>", { desc = "Buffer: Go to 5" })

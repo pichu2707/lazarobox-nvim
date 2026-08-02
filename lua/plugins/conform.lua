@@ -58,32 +58,31 @@ return {
 		})
 
 		-- Keymaps
-		vim.keymap.set({ "n", "v" }, "<leader>mp", function()
+		vim.keymap.set({ "n", "v" }, "<leader>lf", function()
 			conform.format({
 				lsp_fallback = true,
 				async = false,
 				timeout_ms = 1000,
 			})
-		end, { desc = "Format file or range (in visual mode)" })
+		end, { desc = "LSP: Format file or range" })
 
 		-- Toggle formato automático
-		vim.keymap.set("n", "<leader>mf", function()
+		vim.keymap.set("n", "<leader>lF", function()
 			if conform.will_fallback_lsp() then
 				print("Format on save: ON (LSP fallback)")
 			else
 				print("Format on save: ON (conform)")
 			end
-		end, { desc = "Check format on save status" })
+		end, { desc = "LSP: Check format on save status" })
 
 		-- Formatear solo con Biome
-		vim.keymap.set("n", "<leader>mb", function()
+		vim.keymap.set("n", "<leader>lb", function()
 			conform.format({ formatters = { "biome" } })
-		end, { desc = "Format with Biome only" })
+		end, { desc = "LSP: Format with Biome" })
 
 		-- Formatear solo con Prettier
-		vim.keymap.set("n", "<leader>mP", function()
+		vim.keymap.set("n", "<leader>lp", function()
 			conform.format({ formatters = { "prettier" } })
-		end, { desc = "Format with Prettier only" })
+		end, { desc = "LSP: Format with Prettier" })
 	end,
 }
-

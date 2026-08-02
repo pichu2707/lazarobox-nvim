@@ -20,11 +20,11 @@ return {
 						vim.keymap.set("n", lhs, rhs, { buffer = bufnr, desc = desc })
 					end
 
-					map("<leader>rd", vim.diagnostic.open_float, "Rust: show diagnostic")
-					map("<leader>rj", vim.diagnostic.goto_next, "Rust: next diagnostic")
-					map("<leader>rk", vim.diagnostic.goto_prev, "Rust: previous diagnostic")
-					map("<leader>rq", vim.diagnostic.setloclist, "Rust: list diagnostics")
-					map("<leader>rC", "<cmd>RustLsp flyCheck run<cr>", "Rust: run flyCheck")
+					map("<leader>Rd", vim.diagnostic.open_float, "Rust: show diagnostic")
+					map("<leader>Rj", vim.diagnostic.goto_next, "Rust: next diagnostic")
+					map("<leader>Rk", vim.diagnostic.goto_prev, "Rust: previous diagnostic")
+					map("<leader>Rq", vim.diagnostic.setloclist, "Rust: list diagnostics")
+					map("<leader>Rc", "<cmd>RustLsp flyCheck run<cr>", "Rust: run flyCheck")
 				end,
 				default_settings = {
 					-- rust-analyzer language server configuration

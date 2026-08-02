@@ -41,6 +41,7 @@ return {
 					{ icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.picker.files()" },
 					{ icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
 					{ icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.picker.grep()" },
+					{ icon = " ", key = "k", desc = "Keymaps", action = ":Keymaps" },
 					{ icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.picker.recent()" },
 					{
 						icon = " ",
@@ -177,80 +178,30 @@ return {
 			end,
 			desc = "Recent",
 		},
-		-- git
+		-- GitHub pickers. Fugitive owns <leader>g for local Git commands.
 		{
-			"<leader>gb",
-			function()
-				Snacks.picker.git_branches()
-			end,
-			desc = "Git Branches",
-		},
-		{
-			"<leader>gl",
-			function()
-				Snacks.picker.git_log()
-			end,
-			desc = "Git Log",
-		},
-		{
-			"<leader>gL",
-			function()
-				Snacks.picker.git_log_line()
-			end,
-			desc = "Git Log Line",
-		},
-		{
-			"<leader>gs",
-			function()
-				Snacks.picker.git_status()
-			end,
-			desc = "Git Status",
-		},
-		{
-			"<leader>gS",
-			function()
-				Snacks.picker.git_stash()
-			end,
-			desc = "Git Stash",
-		},
-		{
-			"<leader>gd",
-			function()
-				Snacks.picker.git_diff()
-			end,
-			desc = "Git Diff (Hunks)",
-		},
-		{
-			"<leader>gf",
-			function()
-				Snacks.picker.git_log_file()
-			end,
-			desc = "Git Log File",
-		},
-		-- gh
-		{
-			"<leader>gi",
+			"<leader>Gi",
 			function()
 				Snacks.picker.gh_issue()
 			end,
 			desc = "GitHub Issues (open)",
 		},
 		{
-			"<leader>gI",
+			"<leader>Ga",
 			function()
 				Snacks.picker.gh_issue({ state = "all" })
 			end,
 			desc = "GitHub Issues (all)",
 		},
 		{
-			"<leader>gp",
+			"<leader>Gp",
 			function()
 				Snacks.picker.gh_pr()
 			end,
 			desc = "GitHub Pull Requests (open)",
 		},
 		{
-			"<leader>gP",
+			"<leader>GP",
 			function()
 				Snacks.picker.gh_pr({ state = "all" })
 			end,

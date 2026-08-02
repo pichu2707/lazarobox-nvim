@@ -65,5 +65,5 @@ vim.api.nvim_create_user_command("OpenPDF", open_pdf, { desc = "Abrir PDF con vi
 vim.api.nvim_create_user_command("OpenVideo", open_video, { desc = "Abrir video con reproductor externo" })
 
 -- Keymaps opcionales
-vim.keymap.set("n", "<leader>mp", open_pdf, { desc = "Abrir PDF" })
-vim.keymap.set("n", "<leader>mv", open_video, { desc = "Abrir Video" })
+vim.keymap.set("n", "<leader>mp", open_pdf, { desc = "Media: Open PDF" })
+vim.keymap.set("n", "<leader>mv", open_video, { desc = "Media: Open video" })

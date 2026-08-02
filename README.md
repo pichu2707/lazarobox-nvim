@@ -44,6 +44,8 @@ Then restart your terminal, select **JetBrainsMono Nerd Font** as its font, and 
 
 Verify the result at any time with `:checkhealth lazarobox`.
 
+See [`ATAJOS_EJECUTAR_CODIGO.md`](./ATAJOS_EJECUTAR_CODIGO.md) for the current keymap guide and conflict policy.
+
 ### What the installer does
 
 | Step | Detail |

@@ -1,173 +1,264 @@
-# GUIA RAPIDA: EJECUTAR CODIGO EN NEOVIM
+# Atajos de LazaroBox.nvim
 
-## HTML / WEB (Live Server)
+Esta es la guia de control de keymaps. El objetivo no es memorizarlo todo: es saber que existe, donde buscarlo y que prefijo toca cada area.
 
-| Atajo | Acción |
-|-------|--------|
-| `<leader>Ls` | Inicia live-server + abre navegador (puerto 5500) |
-| `<leader>Lx` | Detiene live-server |
+## Camino rapido
 
-**Uso:**
-1. Abre un archivo HTML
-2. Presiona `<leader>Ls`
-3. Se abre el navegador en `http://localhost:5500`
-4. Cambios guardados se recargan automáticamente
-5. `<leader>Lx` para detener cuando termines
+1. Pulsa `<leader>` y espera un momento para ver los grupos disponibles con Which-Key.
+2. Usa `<leader>fk` para buscar cualquier atajo por nombre con Telescope.
+3. Usa `:Keymaps` si prefieres abrir el buscador como comando.
+4. Usa `:map <atajo>` si necesitas comprobar exactamente que comando ejecuta Neovim.
 
----
+`<leader>` suele ser `Space`. Compruebalo con `:echo mapleader` si tienes dudas.
 
-## EJECUTAR ARCHIVO COMPLETO
+## Mapa mental
 
-### Método 1: Atajo Inteligente (RECOMENDADO) ⭐
-**Detecta automáticamente el tipo de archivo y lo ejecuta**
+| Prefijo | Area | Uso principal |
+| --- | --- | --- |
+| `<leader>a` | AI | Claude / Avante |
+| `<leader>b` | Buffers | Cerrar o saltar a buffers |
+| `<leader>c` | Code docs | Generar documentacion con Neogen |
+| `<leader>f` | Find | Buscar archivos, config, keymaps |
+| `<leader>g` | Git | Comandos Git locales con Fugitive |
+| `<leader>G` | GitHub | Issues y pull requests con Snacks |
+| `<leader>h` | Harpoon / hunks | Harpoon y acciones de Gitsigns |
+| `<leader>i` | Imagenes / REPL | Preview de imagen y REPL helpers |
+| `<leader>l` | LSP / lint / format | Diagnosticos, linting y formato |
+| `<leader>L` | Live server | Servidor web local |
+| `<leader>m` | Media | Abrir PDF/video externo |
+| `<leader>r` | Run snippets | SnipRun |
+| `<leader>R` | Rust | Diagnosticos Rust buffer-locales |
+| `<leader>s` | Search | Busquedas en buffers/proyecto |
+| `<leader>t` | Terminal | ToggleTerm |
+| `<leader>w` | Windows | Splits y cierre de ventanas |
+| `<leader>x` | Execute file | Ejecutar archivo actual |
 
-- `<leader>x` - Ejecuta archivo, muestra resultado, presiona Enter para volver
-- `<leader>xx` - Ejecuta en terminal flotante (terminal queda abierto)
+## Descubrimiento
 
-**Funciona con:** Python, JavaScript, TypeScript, Lua, Bash, SQL
+| Atajo | Accion |
+| --- | --- |
+| `<leader>?` | Muestra keymaps del buffer actual |
+| `<leader>fk` | Busca todos los keymaps con Telescope |
+| `:Keymaps` | Abre el mismo buscador de keymaps desde comandos |
+| Dashboard `k` | Abre el buscador de keymaps desde la pantalla inicial |
+| `<leader><space>` | Smart find files |
+| `<leader>,` | Buffers abiertos |
+| `<leader>/` | Grep del proyecto |
+| `<leader>:` | Historial de comandos |
+| `<leader>n` | Historial de notificaciones |
+| `<leader>e` | Explorador de archivos |
 
-**Ejemplo:**
-1. Abre `01_comentarios.py`
-2. Presiona `<leader>xx`
-3. Ve el resultado en la terminal flotante
-4. Presiona `<C-t>` para ocultar terminal
+## Edicion basica
 
----
+| Atajo | Accion |
+| --- | --- |
+| `<A-j>` | Mueve linea o seleccion hacia abajo |
+| `<A-k>` | Mueve linea o seleccion hacia arriba |
+| `<leader>y` | Copia al portapapeles del sistema |
+| `<leader>Y` | Copia la linea al portapapeles del sistema |
+| `<leader>p` | Pega desde el portapapeles del sistema despues |
+| `<leader>P` | Pega desde el portapapeles del sistema antes |
 
-### Método 2: SnipRun (con ventana de resultados)
-- `<leader>rf` - Ejecuta TODO el archivo con SnipRun
+## Ventanas y buffers
 
-**Ejemplo:**
-1. Abre cualquier archivo .py, .js, .ts
-2. Presiona `<leader>rf`
-3. Ves resultados en ventana flotante
+| Atajo | Accion |
+| --- | --- |
+| `<C-h>` | Ir a ventana izquierda |
+| `<C-j>` | Ir a ventana inferior |
+| `<C-k>` | Ir a ventana superior |
+| `<C-l>` | Ir a ventana derecha |
+| `<leader>wv` | Split vertical |
+| `<leader>wh` | Split horizontal |
+| `<leader>wq` | Cerrar ventana |
+| `<Tab>` | Buffer siguiente |
+| `<S-Tab>` | Buffer anterior |
+| `gb` | Buffer siguiente |
+| `gB` | Buffer anterior |
+| `<leader>bc` | Cerrar buffer |
+| `<leader>b1` ... `<leader>b5` | Saltar a buffer 1-5 |
 
----
+## Buscar
 
-### Método 3: Iron REPL (interactivo)
-**Primero inicia el REPL:**
-- `<leader>py` - Python REPL
-- `<leader>js` - JavaScript REPL
-- `<leader>ts` - TypeScript REPL
+| Atajo | Accion |
+| --- | --- |
+| `<leader>ff` | Buscar archivos |
+| `<leader>fg` | Buscar archivos de Git |
+| `<leader>fb` | Buscar buffers |
+| `<leader>fc` | Buscar archivos de config |
+| `<leader>fp` | Buscar proyectos |
+| `<leader>fr` | Archivos recientes |
+| `<leader>sb` | Lineas del buffer actual |
+| `<leader>sB` | Grep en buffers abiertos |
+| `<leader>sg` | Grep del proyecto |
+| `<leader>sw` | Buscar palabra o seleccion visual |
 
-**Luego envía el archivo completo:**
-- `<space>sf` - Envía archivo completo al REPL
+## LSP, lint y formato
 
-**Ejemplo:**
-1. Abre `01_comentarios.py`
-2. Presiona `<leader>py` (se abre REPL a la derecha)
-3. Presiona `<space>sf` (envía todo el archivo)
-4. Ves resultados en el REPL interactivo
+| Atajo | Accion |
+| --- | --- |
+| `K` | Documentacion hover |
+| `gd` | Ir a definicion |
+| `gr` | Buscar referencias |
+| `<leader>rn` | Renombrar simbolo |
+| `<leader>ca` | Code action |
+| `<leader>ld` | Detalle del diagnostico actual |
+| `[d` | Diagnostico anterior |
+| `]d` | Diagnostico siguiente |
+| `<leader>lq` | Lista de diagnosticos |
+| `<leader>ll` | Ejecutar lint |
+| `<leader>li` | Info de linters |
+| `<leader>lf` | Formatear archivo o rango visual |
+| `<leader>lF` | Ver estado de format on save |
+| `<leader>lb` | Formatear con Biome |
+| `<leader>lp` | Formatear con Prettier |
 
----
+## Ejecutar codigo
 
-### Método 4: ToggleTerm (manual)
-- `<C-t>` - Abre terminal flotante
-- Escribe: `python3 archivo.py` (o `node archivo.js`, etc.)
-- `<C-t>` de nuevo para ocultar
+| Atajo | Accion | Cuándo usarlo |
+| --- | --- | --- |
+| `<leader>x` | Ejecuta archivo inline | Resultado rapido, vuelve al editor con Enter |
+| `<leader>xx` | Ejecuta archivo en terminal flotante | Recomendado para programar y ver salida persistente |
+| `<leader>vd` | Ejecuta `npm run dev` en split | Proyectos Vite/frontend |
+| `<C-t>` | Abre/cierra terminal flotante | Terminal manual |
+| `<leader>tt` | Toggle terminal | Alternativa explicita a `<C-t>` |
+| `<leader>tq` | Cierra terminal | Cuando quieres limpiar pantalla |
 
----
+El ejecutor de archivo soporta Python, JavaScript, TypeScript, Lua, Bash, Java, Rust, SQL y HTML. Para Rust, si encuentra `Cargo.toml`, intenta usar `cargo run --bin`; si no, cae a `rustc`.
 
-## ⚡ EJECUTAR LÍNEAS INDIVIDUALES O SELECCIÓN
+## SnipRun
 
-### SnipRun
-- `<leader>r` - Ejecuta línea actual
-- En Visual: selecciona código + `<leader>r` - Ejecuta selección
-- `<leader>rl` - Modo Live (auto-ejecuta mientras escribes)
-- `<leader>rc` - Cierra ventana de resultados
+| Atajo | Accion |
+| --- | --- |
+| `<leader>r` | Ejecutar linea actual |
+| Visual + `<leader>r` | Ejecutar seleccion |
+| `<leader>rr` | Operador de ejecucion |
+| `<leader>rf` | Ejecutar archivo completo |
+| `<leader>rc` | Cerrar resultado de SnipRun |
+| `<leader>ri` | Info de SnipRun |
+| `<leader>rl` | Modo live |
 
-### Iron REPL (más control)
-**Primero abre REPL:** `<leader>py` (o js/ts)
+## Iron REPL
 
-**Luego envía código:**
-- `<space>sl` - Envía línea actual
-- En Visual: `<space>sc` - Envía código seleccionado
-- `<space>sp` - Envía párrafo completo
-- `<space>su` - Envía desde inicio hasta cursor
+| Atajo | Accion |
+| --- | --- |
+| `<leader>py` | Abrir REPL Python |
+| `<leader>js` | Abrir REPL JavaScript |
+| `<leader>ts` | Abrir REPL TypeScript |
+| `<leader>ir` | Reiniciar REPL |
+| `<leader>ih` | Ocultar REPL |
+| `<space>sl` | Enviar linea al REPL |
+| `<space>sc` | Enviar movimiento o seleccion |
+| `<space>sf` | Enviar archivo completo |
+| `<space>sp` | Enviar parrafo |
+| `<space>su` | Enviar desde inicio hasta cursor |
+| `<space>cl` | Limpiar REPL |
+| `<space>sq` | Salir del REPL |
 
-**Controles REPL:**
-- `<leader>ir` - Reiniciar REPL
-- `<leader>ih` - Ocultar REPL
-- `<space>cl` - Limpiar REPL
-- `<space>sq` - Salir del REPL
+## Git y GitHub
 
----
+| Atajo | Accion |
+| --- | --- |
+| `<leader>gs` | Git status |
+| `<leader>gc` | Git commit |
+| `<leader>gca` | Git commit amend |
+| `<leader>gp` | Git push |
+| `<leader>gP` | Git pull |
+| `<leader>gf` | Git fetch |
+| `<leader>gd` | Git diff |
+| `<leader>gb` | Git blame |
+| `<leader>gl` | Git log corto |
+| `<leader>gL` | Git log completo |
+| `<leader>gB` | Git branches |
+| `<leader>gco` | Git checkout |
+| `<leader>ga` | Git add archivo actual |
+| `<leader>gA` | Git add todo |
+| `<leader>gss` | Git stash |
+| `<leader>gsp` | Git stash pop |
+| `<leader>gm` | Git merge |
+| `<leader>gr` | Git rebase |
+| `<leader>go` | Abrir en GitHub/browser |
+| `<leader>Gi` | GitHub issues abiertos |
+| `<leader>Ga` | GitHub issues todos |
+| `<leader>Gp` | GitHub pull requests abiertos |
+| `<leader>GP` | GitHub pull requests todos |
 
-## 🎯 CASOS DE USO ESPECÍFICOS
+## Harpoon y hunks
 
-### Python
-```vim
-<leader>xx          " Ejecuta archivo completo
-<leader>py          " Abre Python REPL
-<space>sl           " Envía línea al REPL
-```
+| Atajo | Accion |
+| --- | --- |
+| `<leader>ha` | Anadir archivo a Harpoon |
+| `<leader>hh` | Menu de Harpoon |
+| `<leader>1` ... `<leader>4` | Saltar a archivo Harpoon 1-4 |
+| `<leader>hn` | Siguiente archivo Harpoon |
+| `<leader>hp` | Archivo anterior Harpoon |
+| `]h` | Siguiente hunk |
+| `[h` | Hunk anterior |
+| `<leader>hs` | Stage hunk |
+| `<leader>hr` | Reset hunk |
+| `<leader>hS` | Stage buffer |
+| `<leader>hR` | Reset buffer |
+| `<leader>hu` | Undo stage hunk |
+| `<leader>hP` | Preview hunk |
+| `<leader>hd` | Diff this |
+| `<leader>hD` | Diff contra `~` |
+| `<leader>hb` | Blame line completo |
+| `<leader>htb` | Toggle blame line |
+| `<leader>htd` | Toggle deleted |
 
-### JavaScript/Node.js
-```vim
-<leader>xx          " Ejecuta con Node
-<leader>js          " Abre Node REPL
-<space>sf           " Envía archivo al REPL
-```
+## AI y documentacion
 
-### TypeScript
-```vim
-<leader>xx          " Ejecuta con ts-node
-<leader>ts          " Abre TypeScript REPL
-```
+| Atajo | Accion |
+| --- | --- |
+| `<leader>ac` | Toggle Claude |
+| Visual + `<leader>as` | Enviar seleccion a Claude |
+| `<leader>aa` | Preguntar a Avante |
+| Visual + `<leader>aa` | Preguntar a Avante sobre seleccion |
+| Visual + `<leader>ae` | Editar seleccion con Avante |
+| `<leader>at` | Toggle sidebar Avante |
+| `<leader>ar` | Refrescar Avante |
+| `<leader>af` | Enfocar sidebar Avante |
+| `<leader>cd` | Generar doc de funcion actual |
+| `<leader>cD` | Generar doc de clase/tipo |
+| `<leader>cf` | Generar doc de archivo |
 
-### SQL (SQLite)
-```vim
-<leader>x           " Te pedirá el archivo de base de datos
-" O manualmente:
-<C-t>               " Abre terminal
-sqlite3 db.db < script.sql
-```
+## Rust
 
-### SQL (PostgreSQL)
-```vim
-<C-t>               " Abre terminal
-psql -U usuario -d database -f script.sql
-```
+Estos keymaps son buffer-locales: aparecen en buffers Rust cuando `rustaceanvim` se adjunta.
 
----
+| Atajo | Accion |
+| --- | --- |
+| `<leader>Rd` | Ver diagnostico Rust |
+| `<leader>Rj` | Siguiente diagnostico Rust |
+| `<leader>Rk` | Diagnostico Rust anterior |
+| `<leader>Rq` | Lista de diagnosticos Rust |
+| `<leader>Rc` | Ejecutar `RustLsp flyCheck run` |
 
-## 🔥 MI RECOMENDACIÓN PARA CADA SITUACIÓN
+## Media y web
 
-| Quiero... | Usa | Atajo |
-|-----------|-----|-------|
-| Ver resultado de TODO el archivo | Atajo inteligente | `<leader>xx` |
-| Ejecutar línea por línea mientras aprendo | SnipRun | `<leader>r` |
-| Probar código interactivo | Iron REPL | `<leader>py` → `<space>sl` |
-| Ver output mientras escribo | SnipRun Live | `<leader>rl` |
-| Ejecutar comandos complejos | ToggleTerm | `<C-t>` |
+| Atajo | Accion |
+| --- | --- |
+| `<leader>Ls` | Iniciar live-server y abrir navegador en `http://localhost:5500` |
+| `<leader>Lx` | Detener live-server |
+| `<leader>mp` | Abrir PDF externo |
+| `<leader>mv` | Abrir video externo |
+| `<leader>ip` | Previsualizar imagen bajo el cursor |
 
----
+## Terminal mode
 
-## 🆘 ATAJOS DE EMERGENCIA
+| Atajo | Accion |
+| --- | --- |
+| `<Esc>` | Salir de modo terminal |
+| `<C-t>` | Cerrar/ocultar terminal |
+| `<C-q>` | Cerrar terminal |
+| `<C-h>` | Ir a ventana izquierda |
+| `<C-j>` | Ir a ventana inferior |
+| `<C-k>` | Ir a ventana superior |
+| `<C-l>` | Ir a ventana derecha |
 
-- `<C-t>` - Abre/cierra terminal (el más simple)
-- `<leader>rc` - Cierra ventanas de SnipRun
-- `<leader>ih` - Oculta REPL
-- `Esc` - Salir de modo terminal
+## Politica para nuevos keymaps
 
----
-
-## 📝 NOTAS IMPORTANTES
-
-1. **ts-node debe estar instalado** para TypeScript:
-   ```bash
-   npm install -g ts-node
-   ```
-
-2. **<leader>** por defecto es la barra espaciadora o `\`
-   - Verifica tu leader con: `:echo mapleader` en Neovim
-
-3. **Recarga la configuración:**
-   ```vim
-   :source ~/.config/nvim/init.lua
-   ```
-   O reinicia Neovim
-
-4. **Ver todos los atajos disponibles:**
-   - En Neovim escribe: `<leader>` y espera un momento
-   - Si tienes which-key verás todos los atajos disponibles
+1. Todo keymap nuevo debe tener `desc` clara.
+2. No reutilices un prefijo si ya pertenece a otra area.
+3. Si un plugin ya registra un grupo, documentalo aqui o cambialo antes de anadir otro.
+4. Ejecuta `<leader>fk` y busca el atajo antes de crear uno nuevo.
+5. Si hay conflicto, primero decide que comportamiento debe quedarse; despues documenta.

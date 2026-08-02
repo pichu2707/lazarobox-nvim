@@ -35,7 +35,7 @@ return {
       map("n", "<leader>hu", gs.undo_stage_hunk, "Undo stage hunk")
 
       -- Preview y diff
-      map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
+      map("n", "<leader>hP", gs.preview_hunk, "Preview hunk")
       map("n", "<leader>hd", gs.diffthis, "Diff this")
      map("n", "<leader>hD", function()
         gs.diffthis("~")
