@@ -5,5 +5,16 @@ return {
 		"nvim-tree/nvim-web-devicons",
 	},
 	ft = { "markdown", "codecompanion" },
-	opts = {},
+	opts = {
+		pipe_table = {
+			preset = "round",
+			style = "full",
+			cell = "padded",
+		},
+		anti_conceal = {
+			ignore = {
+				table_border = true,
+			},
+		},
+	},
 }
