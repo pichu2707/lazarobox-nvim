@@ -35,12 +35,16 @@ jobs:
           previous="$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
           range="${previous:+${previous}..}${GITHUB_REF_NAME}"
 
+          # Types deliberately kept out of the notes. emit() appends to this as
+          # it goes, so emit_other() below can never drift out of sync with the
+          # groups actually declared.
+          covered='bump'
+
           # Renders one "## Heading" section per conventional-commit type.
-          # $1 is an alternation of types, $2 the heading. Types absent from the
-          # calls below are dropped from the notes, which is how bump(version)
-          # commits stay out of them.
+          # $1 is an alternation of types, $2 the heading.
           emit() {
             local body
+            covered="${covered}|$1"
             body="$(git log --no-merges --pretty=format:'%s|%h' "$range" \
               | { grep -E "^($1)(\([^)]*\))?!?: " || true; } \
               | sed -E 's#^[a-z]+\(([^)]*)\)!?: *(.*)\|(.*)$#- **\1**: \2 (\3)#; s#^[a-z]+!?: *(.*)\|(.*)$#- \1 (\2)#')"
@@ -51,6 +55,20 @@ jobs:
             return 0
           }
 
+          # Safety net: any conventional commit whose type has no group above
+          # still shows up, instead of vanishing from the notes in silence.
+          emit_other() {
+            local body
+            body="$(git log --no-merges --pretty=format:'%s|%h' "$range" \
+              | { grep -E "^[a-z]+(\([^)]*\))?!?: " || true; } \
+              | { grep -vE "^(${covered})(\([^)]*\))?!?: " || true; } \
+              | sed -E 's#^[a-z]+\(([^)]*)\)!?: *(.*)\|(.*)$#- **\1**: \2 (\3)#; s#^[a-z]+!?: *(.*)\|(.*)$#- \1 (\2)#')"
+            if [ -n "$body" ]; then
+              printf '## %s\n\n%s\n\n' "$1" "$body"
+            fi
+            return 0
+          }
+
           {
             emit 'feat'           'Features'
             emit 'fix'            'Fixes'
@@ -58,6 +76,7 @@ jobs:
             emit 'refactor'       'Refactoring'
             emit 'ci|build|chore' 'Tooling'
             emit 'docs'           'Documentation'
+            emit_other            'Other'
             if [ -n "$previous" ]; then
               printf '**Full changelog**: https://github.com/%s/compare/%s...%s\n' \
                 "${GITHUB_REPOSITORY}" "$previous" "${GITHUB_REF_NAME}"
