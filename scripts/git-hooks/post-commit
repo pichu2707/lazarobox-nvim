@@ -1,20 +1,36 @@
 #!/bin/bash
 set -e
 
-MSG=$(git log -1 --pretty=%B)
-
-# Evitar loop: no bumpear el propio commit de bump
-if echo "$MSG" | grep -qE "^bump\(version\):"; then
+# Solo versionamos desde main. Un bump en una rama de feature etiquetaría
+# trabajo sin mergear, y con push.followTags ese tag publicaría un release.
+# En rebase o detached HEAD, rev-parse devuelve "HEAD" y también salimos.
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [ "$BRANCH" != "main" ]; then
 	exit 0
 fi
 
-# Detectar tipo de bump
-if echo "$MSG" | grep -qiE "^(fix|perf|revert)[(!]"; then
-	TYPE="patch"
-elif echo "$MSG" | grep -qiE "^feat[(!]"; then
-	TYPE="minor"
-elif echo "$MSG" | grep -qiE "BREAKING CHANGE"; then
+# El tipo se detecta SOLO sobre el asunto. Leyendo el mensaje completo,
+# cualquier línea del cuerpo (un log de squash, una cita) disparaba un bump.
+SUBJECT=$(git log -1 --pretty=%s)
+BODY=$(git log -1 --pretty=%B)
+
+# Evitar loop: no bumpear el propio commit de bump
+if echo "$SUBJECT" | grep -qE "^bump\(version\):"; then
+	exit 0
+fi
+
+# Detectar tipo de bump. En conventional commits el "!" marca breaking change
+# sea cual sea el tipo, así que se comprueba antes. BREAKING CHANGE debe ser un
+# footer de verdad: anclado a inicio de línea y sensible a mayúsculas, para que
+# mencionar el término en prosa no provoque un major.
+if echo "$SUBJECT" | grep -qiE "^[a-z]+(\([^)]*\))?!:"; then
 	TYPE="major"
+elif echo "$BODY" | grep -qE "^BREAKING[ -]CHANGE:"; then
+	TYPE="major"
+elif echo "$SUBJECT" | grep -qiE "^(fix|perf|revert)(\([^)]*\))?:"; then
+	TYPE="patch"
+elif echo "$SUBJECT" | grep -qiE "^feat(\([^)]*\))?:"; then
+	TYPE="minor"
 else
 	exit 0
 fi
