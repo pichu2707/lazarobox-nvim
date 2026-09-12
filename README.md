@@ -54,10 +54,35 @@ See [`ATAJOS_EJECUTAR_CODIGO.md`](./ATAJOS_EJECUTAR_CODIGO.md) for the current k
 | Dependencies | `ripgrep`, `fd`, `imagemagick`, `chafa`, `node`, a C compiler — detected via apt, pacman, dnf, zypper, brew or winget |
 | Clipboard | `xclip` on X11, `wl-clipboard` on Wayland, `win32yank.exe` on WSL, native on macOS |
 | Config | Links the repository into `~/.config/nvim` (`%LOCALAPPDATA%\nvim` on Windows), backing up anything already there |
-| Git hooks | Runs `scripts/install-hooks.sh` |
+| Git hooks | Installs the versioning hook — `scripts/install-hooks.sh` on Linux/macOS, copied into `.git/hooks` on Windows |
 
 The installer is **idempotent** — re-running it skips whatever is already in place, so
 it is safe to use to repair a broken setup.
+
+### Automatic versioning
+
+This repository versions itself from [Conventional Commits](https://www.conventionalcommits.org/).
+A git hook reads each commit message on `main` and, when it matches, bumps `VERSION`
+and tags the release — no manual `npm version` or changelog editing.
+
+| Commit type | Bump |
+| --- | --- |
+| `fix`, `perf`, `revert` — scope optional | Patch |
+| `feat` — scope optional | Minor |
+| Any type marked breaking (`feat!:`, `fix!:`) or a `BREAKING CHANGE:` footer | Major |
+| Anything else (`docs`, `chore`, `ci`, `test`, `style`, `refactor`, …) | No bump |
+
+The hook only runs on `main`, so committing to a feature branch never tags anything.
+`BREAKING CHANGE:` counts only as a real footer at the start of a line — mentioning
+the phrase in prose does not trigger a major bump.
+
+The installers set up this hook for you (see the table above). If you already have
+the repo cloned and skipped the installer — or the hook needs reinstalling — run it
+by hand:
+
+```bash
+./scripts/install-hooks.sh
+```
 
 ### Options
 
