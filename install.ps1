@@ -363,6 +363,73 @@ function Install-ConfigLink {
 }
 
 # ------------------------------------------------------------------------------
+# Git hooks
+#
+# scripts/install-hooks.sh enlaza los hooks con symlinks, y crearlos en NTFS
+# pide privilegio de administrador o Modo de desarrollador (SeCreateSymbolic-
+# LinkPrivilege). Igual que Install-ConfigLink evita ese problema usando una
+# Junction en vez de un symlink, aqui lo evitamos copiando el fichero: un hook
+# de git no necesita ser un symlink, basta con que exista en .git\hooks.
+#
+# La copia tambien evita depender de bash: Git for Windows ya sabe ejecutar
+# estos hooks interpretando el shebang con su propio sh.exe, igual que en
+# Linux o macOS.
+# ------------------------------------------------------------------------------
+
+function Install-GitHooks {
+    param([string]$RepoDir)
+
+    Write-Step 'Git hooks'
+
+    $gitDir = Join-Path $RepoDir '.git'
+    # -PathType Container: en un worktree o submodulo, .git es un FICHERO, no un
+    # directorio. Test-Path a secas devolvia $true y fallabamos mas adelante con
+    # una excepcion generica en vez de saltar limpiamente, como hace install.sh.
+    if (-not (Test-Path $gitDir -PathType Container)) {
+        Write-Skip 'No es un clon de git: no hay hooks que instalar'
+        return
+    }
+
+    $hooksSource = Join-Path $RepoDir 'scripts\git-hooks'
+    if (-not (Test-Path $hooksSource)) {
+        Write-Skip 'scripts/git-hooks no disponible'
+        return
+    }
+
+    try {
+        $hooksTarget = Join-Path $gitDir 'hooks'
+        New-Item -ItemType Directory -Path $hooksTarget -Force | Out-Null
+
+        Get-ChildItem -Path $hooksSource -File | ForEach-Object {
+            # Un clon con autocrlf=true convierte estos scripts a CRLF, lo que
+            # rompe el shebang bajo el interprete MSYS (#!/bin/bash\r no
+            # existe). Normalizamos a LF al copiar.
+            $content = [IO.File]::ReadAllText($_.FullName) -replace "`r`n", "`n"
+            $destPath = Join-Path $hooksTarget $_.Name
+
+            # install-hooks.sh deja un symlink al repo. Escribir sobre un symlink
+            # SIGUE el enlace: sobreescribiriamos el fichero fuente versionado en
+            # vez de reemplazar el hook. Lo borramos antes.
+            if (Test-Path $destPath) {
+                Remove-Item -Path $destPath -Force
+            }
+
+            # UTF8Encoding($false) = sin BOM. El overload sin encoding de
+            # WriteAllText emite BOM en .NET Framework (PowerShell 5.1), y un BOM
+            # delante de #!/bin/bash rompe la deteccion del shebang.
+            $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+            [IO.File]::WriteAllText($destPath, $content, $utf8NoBom)
+        }
+
+        Write-Ok 'Hooks instalados'
+    }
+    catch {
+        Write-Warn "No he podido instalar los git hooks: $($_.Exception.Message)"
+        Write-Warn 'Instalalos a mano desde Git Bash: bash scripts/install-hooks.sh'
+    }
+}
+
+# ------------------------------------------------------------------------------
 # Resumen
 # ------------------------------------------------------------------------------
 
@@ -444,4 +511,5 @@ Install-Dependencies
 Install-NerdFont
 Set-WindowsTerminalFont
 Install-ConfigLink -RepoDir $repoDir
+Install-GitHooks -RepoDir $repoDir
 Write-Summary

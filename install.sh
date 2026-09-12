@@ -598,7 +598,11 @@ install_git_hooks() {
 		return
 	fi
 
-	"$REPO_DIR/scripts/install-hooks.sh" >/dev/null && ok "Hooks instalados"
+	if "$REPO_DIR/scripts/install-hooks.sh" >/dev/null; then
+		ok "Hooks instalados"
+	else
+		warn "No he podido instalar los git hooks; ejecuta scripts/install-hooks.sh a mano"
+	fi
 }
 
 # ------------------------------------------------------------------------------
