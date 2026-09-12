@@ -16,6 +16,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          # Required: git describe needs the full tag history to find the
+          # previous tag. A shallow clone would drop every changelog link.
           fetch-depth: 0
 
       - name: Verify VERSION matches the tag
@@ -28,11 +30,47 @@ jobs:
           fi
           echo "VERSION file and tag agree on ${file}."
 
+      - name: Build the release notes from the commit log
+        run: |
+          previous="$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
+          range="${previous:+${previous}..}${GITHUB_REF_NAME}"
+
+          # Renders one "## Heading" section per conventional-commit type.
+          # $1 is an alternation of types, $2 the heading. Types absent from the
+          # calls below are dropped from the notes, which is how bump(version)
+          # commits stay out of them.
+          emit() {
+            local body
+            body="$(git log --no-merges --pretty=format:'%s|%h' "$range" \
+              | { grep -E "^($1)(\([^)]*\))?!?: " || true; } \
+              | sed -E 's#^[a-z]+\(([^)]*)\)!?: *(.*)\|(.*)$#- **\1**: \2 (\3)#; s#^[a-z]+!?: *(.*)\|(.*)$#- \1 (\2)#')"
+            if [ -n "$body" ]; then
+              printf '## %s\n\n%s\n\n' "$2" "$body"
+            fi
+            # Never let an empty section abort the step under `set -e`.
+            return 0
+          }
+
+          {
+            emit 'feat'           'Features'
+            emit 'fix'            'Fixes'
+            emit 'perf'           'Performance'
+            emit 'refactor'       'Refactoring'
+            emit 'ci|build|chore' 'Tooling'
+            emit 'docs'           'Documentation'
+            if [ -n "$previous" ]; then
+              printf '**Full changelog**: https://github.com/%s/compare/%s...%s\n' \
+                "${GITHUB_REPOSITORY}" "$previous" "${GITHUB_REF_NAME}"
+            fi
+          } > "${RUNNER_TEMP}/notes.md"
+
+          cat "${RUNNER_TEMP}/notes.md"
+
       - name: Create the release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "${GITHUB_REF_NAME}" \
             --title "${GITHUB_REF_NAME}" \
-            --generate-notes \
+            --notes-file "${RUNNER_TEMP}/notes.md" \
             --verify-tag
