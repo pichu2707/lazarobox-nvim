@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to preview notes for. Defaults to the most recent tag. Nothing is published."
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -20,20 +26,53 @@ jobs:
           # previous tag. A shallow clone would drop every changelog link.
           fetch-depth: 0
 
-      - name: Verify VERSION matches the tag
+      - name: Resolve the tag
+        id: resolve
+        env:
+          # Via env, never interpolated into the script: a ${{ }} expansion
+          # inside run: would let the input inject shell.
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
-          tag="${GITHUB_REF_NAME#v}"
-          file="$(tr -d '[:space:]' < VERSION)"
-          if [ "$tag" != "$file" ]; then
-            echo "::error::Tag ${GITHUB_REF_NAME} does not match the VERSION file (${file}). Bump VERSION before tagging."
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            tag="${GITHUB_REF_NAME}"
+          elif [ -n "${INPUT_TAG}" ]; then
+            tag="${INPUT_TAG}"
+          else
+            tag="$(git describe --tags --abbrev=0)"
+          fi
+
+          if ! git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            echo "::error::Tag ${tag} does not exist in this repository."
             exit 1
           fi
-          echo "VERSION file and tag agree on ${file}."
+
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: ${tag}"
+
+      - name: Verify VERSION matches the tag
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
+        run: |
+          want="${TAG#v}"
+          # Read VERSION out of the tag's own tree. On workflow_dispatch the
+          # checkout is the default branch, whose VERSION has usually moved on.
+          got="$(git show "${TAG}:VERSION" | tr -d '[:space:]')"
+
+          if [ "$want" = "$got" ]; then
+            echo "VERSION file and tag agree on ${got}."
+          elif [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            echo "::error::Tag ${TAG} does not match its VERSION file (${got}). Bump VERSION before tagging."
+            exit 1
+          else
+            echo "::warning::Tag ${TAG} does not match its VERSION file (${got}). Previewing anyway."
+          fi
 
       - name: Build the release notes from the commit log
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
         run: |
-          previous="$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
-          range="${previous:+${previous}..}${GITHUB_REF_NAME}"
+          previous="$(git describe --tags --abbrev=0 "${TAG}^" 2>/dev/null || true)"
+          range="${previous:+${previous}..}${TAG}"
 
           # Types deliberately kept out of the notes. emit() appends to this as
           # it goes, so emit_other() below can never drift out of sync with the
@@ -79,17 +118,34 @@ jobs:
             emit_other            'Other'
             if [ -n "$previous" ]; then
               printf '**Full changelog**: https://github.com/%s/compare/%s...%s\n' \
-                "${GITHUB_REPOSITORY}" "$previous" "${GITHUB_REF_NAME}"
+                "${GITHUB_REPOSITORY}" "$previous" "${TAG}"
             fi
           } > "${RUNNER_TEMP}/notes.md"
 
           cat "${RUNNER_TEMP}/notes.md"
 
+      - name: Show the notes in the run summary
+        env:
+          TAG: ${{ steps.resolve.outputs.tag }}
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+            printf '# Release %s\n\n' "${TAG}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            printf '# Preview of %s\n\n_Dry run: nothing was published._\n\n' "${TAG}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          cat "${RUNNER_TEMP}/notes.md" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Create the release
+        if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.resolve.outputs.tag }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            --title "${GITHUB_REF_NAME}" \
+          gh release create "${TAG}" \
+            --title "${TAG}" \
             --notes-file "${RUNNER_TEMP}/notes.md" \
             --verify-tag
+
+      - name: Dry run notice
+        if: github.event_name != 'push'
+        run: echo "::notice::Preview only — no release was created. Push the tag to publish."
