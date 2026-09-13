@@ -36,7 +36,7 @@ return {
 		},
 	},
 	keys = {
-		{ "<leader>co", "<cmd>CodeCompanionChat Toggle<cr>", desc = "CodeCompanion: Toggle Chat" },
+		{ "<leader>cot", "<cmd>CodeCompanionChat Toggle<cr>", desc = "CodeCompanion: Toggle Chat" },
 		{ "<leader>coa", "<cmd>CodeCompanionActions<cr>", desc = "CodeCompanion: Actions" },
 		{ "<leader>coi", "<cmd>CodeCompanion<cr>", desc = "CodeCompanion: Inline" },
 		{ "<leader>coc", "<cmd>CodeCompanionChat anthropic<cr>", desc = "CodeCompanion: Chat Claude" },

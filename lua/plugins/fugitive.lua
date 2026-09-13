@@ -27,9 +27,9 @@ return {
     vim.keymap.set("n", "<leader>ga", ":Git add %<CR>", { desc = "Git add current file" })
     vim.keymap.set("n", "<leader>gA", ":Git add .<CR>", { desc = "Git add all" })
 
-    -- Stash
-    vim.keymap.set("n", "<leader>gss", ":Git stash<CR>", { desc = "Git stash" })
-    vim.keymap.set("n", "<leader>gsp", ":Git stash pop<CR>", { desc = "Git stash pop" })
+    -- Stash (kept out of <leader>gs* so "Git status" is not shadowed)
+    vim.keymap.set("n", "<leader>gz", ":Git stash<CR>", { desc = "Git stash" })
+    vim.keymap.set("n", "<leader>gZ", ":Git stash pop<CR>", { desc = "Git stash pop" })
 
     -- Merge y Rebase
     vim.keymap.set("n", "<leader>gm", ":Git merge ", { desc = "Git merge" })

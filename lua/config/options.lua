@@ -29,6 +29,9 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.clipboard = "unnamedplus"
 vim.opt.swapfile = false
+-- Cap how long Neovim waits for a follow-up key after a mapping prefix
+-- (default is 1000ms, which stalls on every leader prefix).
+vim.opt.timeoutlen = 300
 vim.filetype.add({
 	extension = {
 		mdx = "markdown",

@@ -27,12 +27,12 @@ return {
 			{ "<leader>l", group = "LSP / lint / format" },
 			{ "<leader>L", group = "Live server" },
 			{ "<leader>m", group = "Media" },
-			{ "<leader>r", group = "Run snippets" },
+			{ "<leader>O", group = "OpenCode" },
+			{ "<leader>r", group = "Rename" },
 			{ "<leader>R", group = "Rust" },
 			{ "<leader>s", group = "Search" },
 			{ "<leader>t", group = "Terminal" },
 			{ "<leader>w", group = "Windows" },
-			{ "<leader>x", group = "Execute file" },
 		})
 	end,
 }

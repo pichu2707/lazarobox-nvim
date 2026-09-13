@@ -5,13 +5,9 @@ vim.keymap.set("n", "gB", ":bp<CR>", { noremap = true, silent = true, desc = "Pr
 vim.keymap.set("n", "<leader>ac", "<cmd>ClaudeCode<cr>", { desc = "AI: Toggle Claude" })
 vim.keymap.set("v", "<leader>as", "<cmd>ClaudeCodeSend<cr>", { desc = "AI: Send selection to Claude" })
 
--- Avante (Ollama AI)
-vim.keymap.set("n", "<leader>aa", "<cmd>AvanteAsk<cr>", { desc = "AI: Ask Avante" })
-vim.keymap.set("v", "<leader>aa", "<cmd>AvanteAsk<cr>", { desc = "AI: Ask Avante about selection" })
-vim.keymap.set("n", "<leader>at", "<cmd>AvanteToggle<cr>", { desc = "AI: Toggle Avante sidebar" })
-vim.keymap.set("v", "<leader>ae", "<cmd>AvanteEdit<cr>", { desc = "AI: Edit selection with Avante" })
-vim.keymap.set("n", "<leader>ar", "<cmd>AvanteRefresh<cr>", { desc = "AI: Refresh Avante" })
-vim.keymap.set("n", "<leader>af", "<cmd>AvanteFocus<cr>", { desc = "AI: Focus Avante sidebar" })
+-- Avante mappings removed: the plugin is not installed (no spec under
+-- lua/plugins, absent from lazy-lock.json), so :AvanteAsk and friends only ever
+-- returned E492. The <leader>a "AI" group stays: claudecode.nvim uses it.
 
 -- Mover líneas de arriba/abajo (Modo Normal)
 vim.keymap.set("n", "<A-j>", ":m .+1<CR>==", { noremap = true, silent = true, desc = "Bajar una línea el código" })
@@ -21,11 +17,11 @@ vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { noremap = true, silent = true, de
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv=gv", { noremap = true, silent = true, desc = "Bajar bloque seleccionado" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv=gv", { noremap = true, silent = true, desc = "Subir bloque seleccionado" })
 
--- Clipboard system integration
-vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Clipboard: Copy" })
-vim.keymap.set("n", "<leader>Y", '"+Y', { desc = "Clipboard: Copy line" })
-vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Clipboard: Paste after" })
-vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', { desc = "Clipboard: Paste before" })
+-- Clipboard: no mappings needed. options.lua sets clipboard = "unnamedplus",
+-- which makes the unnamed register the "+" register, so plain y/Y/p/P already
+-- read and write the system clipboard. Explicit "+y / "+p mappings would be
+-- exact duplicates of the builtins, and <leader>p also stalled behind
+-- <leader>py for a full timeoutlen.
 
 -- Split windows
 vim.keymap.set("n", "<leader>wv", ":vsplit<CR>", { noremap = true, silent = true, desc = "Window: Split vertical" })
@@ -42,11 +38,26 @@ vim.keymap.set("n", "<C-l>", "<C-w>l", { noremap = true, silent = true, desc = "
 vim.keymap.set("n", "K", vim.lsp.buf.hover, {
 	desc = "LSP Hover documentation",
 })
-vim.keymap.set("n", "gd", vim.lsp.buf.definition, {
+-- Snacks presents these in the same picker as the rest of the config, with a
+-- preview pane. vim.lsp.buf.* on its own dumps results into the quickfix list,
+-- which is the only place this config drops out of that UI. The pcall keeps the
+-- builtin as a fallback if snacks ever fails to load.
+local function lsp_pick(picker, builtin)
+	return function()
+		local ok, snacks = pcall(require, "snacks")
+		if ok and snacks.picker then
+			snacks.picker[picker]()
+		else
+			builtin()
+		end
+	end
+end
+
+vim.keymap.set("n", "gd", lsp_pick("lsp_definitions", vim.lsp.buf.definition), {
 	desc = "Go to definition",
 })
 
-vim.keymap.set("n", "gr", vim.lsp.buf.references, {
+vim.keymap.set("n", "gr", lsp_pick("lsp_references", vim.lsp.buf.references), {
 	desc = "Find references",
 })
 
@@ -237,7 +248,7 @@ local function run_in_toggleterm()
 	run_term:toggle()
 end
 
-vim.keymap.set("n", "<leader>xx", run_in_toggleterm, { desc = "Execute file in terminal" })
+vim.keymap.set("n", "<leader>X", run_in_toggleterm, { desc = "Execute file in terminal" })
 vim.keymap.set("n", "<leader>ip", function()
 	local src = vim.fn.expand("<cfile>")
 	if src == "" then

@@ -43,13 +43,7 @@ return{
       borders = 'single',        -- display borders around floating windows borders = { "╔", "═" ,"╗", "║", "╝", "═", "╚", "║" }
     })
 
-    -- Keymaps
-    vim.keymap.set('v', '<leader>r', '<Plug>SnipRun', { desc = 'Run selected code' })
-    vim.keymap.set('n', '<leader>rr', '<Plug>SnipRunOperator', { desc = 'Run code operator' })
-    vim.keymap.set('n', '<leader>r', '<Plug>SnipRun', { desc = 'Run current line' })
-    vim.keymap.set('n', '<leader>rf', ':%SnipRun<CR>', { desc = 'Run entire file' })
-    vim.keymap.set('n', '<leader>rc', '<Plug>SnipClose', { desc = 'Close SnipRun' })
-    vim.keymap.set('n', '<leader>ri', '<Plug>SnipInfo', { desc = 'SnipRun info' })
-    vim.keymap.set('n', '<leader>rl', '<Plug>SnipLive', { desc = 'SnipRun live mode' })
+    -- Keymaps removed in favour of the <leader>x runners (see keymaps.lua).
+    -- The :SnipRun* commands remain available.
   end,
 }

@@ -237,5 +237,22 @@ return {
 			desc = "Visual selection or word",
 			mode = { "n", "x" },
 		},
+
+		-- LSP symbols: search by symbol rather than by text, so the results
+		-- carry their kind (function, class, method) and skip comments.
+		{
+			"<leader>ss",
+			function()
+				Snacks.picker.lsp_symbols()
+			end,
+			desc = "Symbols in file",
+		},
+		{
+			"<leader>sS",
+			function()
+				Snacks.picker.lsp_workspace_symbols()
+			end,
+			desc = "Symbols in project",
+		},
 	},
 }
