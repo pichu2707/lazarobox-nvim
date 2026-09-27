@@ -65,18 +65,10 @@ return {
 			capabilities = capabilities,
 		})
 
-		-- Python
-		lspconfig.pylsp.setup({
+		-- Python (pyright). El intérprete (.venv) se configura por proyecto en
+		-- pyproject.toml -> [tool.pyright] venvPath/venv, así ve Django y django-stubs.
+		lspconfig.pyright.setup({
 			capabilities = capabilities,
-			settings = {
-				pylsp = {
-					plugins = {
-						jedi = {
-							extra_paths = { "src" },
-						},
-					},
-				},
-			},
 		})
 
 		-- Astro con protección contra crashes

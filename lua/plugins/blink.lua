@@ -67,6 +67,8 @@ return {
 					name = 'Snippets',
 					module = 'blink.cmp.sources.snippets',
 					score_offset = 80,
+					-- Snippets de Django (friendly-snippets) también en ficheros .py
+					opts = { extended_filetypes = { python = { 'django' } } },
 				},
 				path = {
 					name = 'Path',
