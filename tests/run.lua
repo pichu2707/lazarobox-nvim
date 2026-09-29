@@ -2,6 +2,9 @@
 -- Descubre tests/*_spec.lua, ejecuta cada caso y sale con codigo != 0 si algo falla.
 local root = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h:h")
 package.path = root .. "/lua/?.lua;" .. root .. "/lua/?/init.lua;" .. package.path
+-- colors/ se resuelve por runtimepath: sin esto :colorscheme lazarobox solo
+-- funcionaria si el repo esta clonado en ~/.config/nvim (no es el caso en CI)
+vim.opt.rtp:prepend(root)
 
 local passed, failed = 0, 0
 
