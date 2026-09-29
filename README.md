@@ -6,7 +6,7 @@
 [ LZBOX ] :: signal > noise*Signal over noise.*
 ```
 
-A cyberpunk-inspired Neovim colorscheme built on top of Catppuccin, designed for clarity, contrast, and long coding sessions.
+A standalone, cyberpunk-inspired Neovim colorscheme with zero theme dependencies, designed for clarity, contrast, and long coding sessions.
 
 > ⚡ For the full experience, pair it with the official WezTerm config.
 
@@ -167,7 +167,7 @@ Inspired by cyberpunk terminals and modern developer workflows.
 ## ⚙️ Using the colorscheme on its own
 
 Prefer to keep your own config and only take the colours? Install LazaroBox as a plugin
-instead of running the installer.
+instead of running the installer. It ships its own colorscheme, so no other theme plugin is needed.
 
 ### Using lazy.nvim
 
@@ -175,77 +175,36 @@ instead of running the installer.
 {
   "pichu2707/lazarobox-nvim",
   name = "lazarobox",
+  lazy = false,
   priority = 1000,
   config = function()
-    require("catppuccin").setup({
-      transparent_background = true,
-
-      color_overrides = {
-        all = {
-          base = "#191E28",
-          mantle = "#191E28",
-          crust = "#232A40",
-
-          text = "#F3F6F9",
-          subtext0 = "#5C6170",
-          subtext1 = "#00FFFF",
-
-          blue = "#7FB4CA",
-          mauve = "#C99AD6",
-          pink = "#B99BF2",
-          green = "#B7CC85",
-          yellow = "#FFE066",
-          rosewater = "#E0C15A",
-          red = "#CB7C94",
-          peach = "#DEBA87",
-        },
-      },
-    })
-
-    vim.cmd.colorscheme("catppuccin")
+    vim.cmd.colorscheme("lazarobox")
   end,
 }
 ```
 
 ## Configuration
 
-This theme is based on Catppuccin, using custom color overrides.
+LazaroBox is a plain Lua colorscheme: `:colorscheme lazarobox` loads it.
 
-Example setup:
+- **Palette** — every colour lives in `lua/lazarobox/palette.lua`. Change a value there and the
+  whole theme follows.
+- **Highlight groups** — editor UI, syntax, Treesitter, LSP and diff groups are defined in
+  `lua/lazarobox/theme.lua`.
+- **Plugin integrations** — one module per plugin in `lua/lazarobox/integrations/`, enabled from
+  `lua/lazarobox/integrations/init.lua`.
+
+The background is solid by default, so the terminal decides how much of its own background shows
+through Neovim (in WezTerm, `text_background_opacity`). For a fully transparent background, set
+this before the colorscheme loads:
 
 ```lua
-require("catppuccin").setup({
-  flavour = "mocha",
-  transparent_background = true,
-
-  color_overrides = {
-    all = {
-      base = "#191E28",
-      mantle = "#191E28",
-      crust = "#232A40",
-
-      text = "#F3F6F9",
-      subtext0 = "#5C6170",
-      subtext1 = "#00FFFF",
-
-      blue = "#7FB4CA",
-      mauve = "#C99AD6",
-      pink = "#B99BF2",
-      green = "#B7CC85",
-      yellow = "#FFE066",
-      rosewater = "#E0C15A",
-      red = "#CB7C94",
-      peach = "#DEBA87",
-    },
-  },
-})
-
-vim.cmd.colorscheme("catppuccin")
+vim.g.lazarobox_transparent = true
 ```
 
 ## ⚡ Features
 
-- Transparent background first-class support
+- Solid or fully transparent background (`vim.g.lazarobox_transparent`)
 - Tuned for Treesitter + LSP highlights
 - Balanced saturation (no retina burn)
 - Functional color semantics (not decorative)

@@ -21,6 +21,12 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
+-- Tema antes de lazy.setup: lazarobox vive en colors/ de esta config, asi que
+-- no necesita plugin ni `priority = 1000`. Aplicarlo aqui garantiza que los
+-- plugins que leen highlights al configurarse (lualine, gitsigns, noice,
+-- snacks...) ya lo vean, incluso los que cargan durante el propio setup.
+vim.cmd.colorscheme("lazarobox")
+
 -- Setup lazy.nvim
 require("lazy").setup({
   spec = {
@@ -28,8 +34,8 @@ require("lazy").setup({
     { import = "plugins" },
   },
   -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  -- install = { colorscheme = { "habamax" } },
+  -- Tema de la UI de lazy cuando instala plugins en el primer arranque
+  install = { colorscheme = { "lazarobox" } },
   -- automatically check for plugin updates
   checker = { enabled = true },
   -- Deshabilitar soporte de luarocks para evitar errores

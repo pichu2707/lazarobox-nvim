@@ -3,7 +3,7 @@ local palette = require("lazarobox.palette")
 
 -- Grupos que el tema debe definir siempre: UI del editor, sintaxis clasica,
 -- capturas de treesitter, tokens semanticos, diagnosticos y diff. Si falta uno,
--- Neovim cae a su default y el cambio desde catppuccin dejaria de ser invisible.
+-- Neovim cae a su default y el tema dejaria de verse como cuando lo pintaba catppuccin.
 local REQUIRED = {
 	-- UI del editor
 	"Normal", "NormalNC", "NormalFloat", "FloatBorder", "FloatTitle",
@@ -151,10 +151,25 @@ describe("colors/lazarobox.lua", function()
 		local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
 		assert_eq(tonumber(palette.colors.fg:sub(2), 16), normal.fg)
 	end)
+
+	it("pinta fondo solido por defecto", function()
+		vim.g.lazarobox_transparent = nil
+		vim.cmd.colorscheme("lazarobox")
+		local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
+		assert_eq(tonumber(palette.colors.bg:sub(2), 16), normal.bg)
+	end)
+
+	it("vim.g.lazarobox_transparent = true lo deja transparente", function()
+		vim.g.lazarobox_transparent = true
+		vim.cmd.colorscheme("lazarobox")
+		local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
+		vim.g.lazarobox_transparent = nil
+		assert_eq(nil, normal.bg)
+	end)
 end)
 
 -- syntax/csv.vim del runtime colorea cada columna con csvCol0..8 (sin
--- treesitter para csv). catppuccin los pinta en arcoiris; si faltan, las
+-- treesitter para csv). catppuccin los pintaba en arcoiris; si faltan, las
 -- columnas salen con los links por defecto del runtime.
 describe("theme.groups csv", function()
 	local g = theme.groups(palette.colors)

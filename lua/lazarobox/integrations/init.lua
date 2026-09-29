@@ -1,9 +1,10 @@
 -- Integraciones de plugins del tema Lazarobox.
 --
--- Solo estan las que catppuccin aplica hoy Y leen plugins instalados: el tema
--- debe verse igual, no "mejor". catppuccin tambien define Cmp*, Mini* y
--- NvimTree*, pero aqui no hay nvim-cmp (blink.cmp usa Pmenu*), ni mini.nvim,
--- ni nvim-tree (se usa oil), asi que esos grupos no pintan nada y no se copian.
+-- Solo estan las que catppuccin aplicaba cuando pintaba el tema Y leen plugins
+-- instalados: el cambio de motor debia verse igual, no "mejor". catppuccin
+-- tambien definia Cmp*, Mini* y NvimTree*, pero aqui no hay nvim-cmp (blink.cmp
+-- usa Pmenu*), ni mini.nvim, ni nvim-tree (se usa oil), asi que esos grupos no
+-- pintarian nada y no se copiaron.
 --
 -- Cada modulo devuelve function(c, o) -> { [grupo] = spec }, donde c es la
 -- paleta y o las opciones del tema (o.transparent).

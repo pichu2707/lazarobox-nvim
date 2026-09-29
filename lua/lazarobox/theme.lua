@@ -1,12 +1,13 @@
 -- Tema Lazarobox sin dependencias: `:colorscheme lazarobox`.
 --
--- Reproduce los grupos base que catppuccin pinta hoy con la paleta de
--- lazarobox.palette, para que cambiar de motor sea invisible. Por eso los
--- colores de cada grupo siguen el mapeo de catppuccin (p.ej. Function en azul,
--- Type en amarillo); los comentarios de la paleta documentan ese uso real.
+-- Pinta los grupos base con la paleta de lazarobox.palette. Hasta que se
+-- independizo, el tema lo pintaba catppuccin/nvim; estos grupos se copiaron de
+-- aquel resultado para que el cambio de motor fuera invisible. Por eso los
+-- colores siguen el mapeo de catppuccin (p.ej. Function en azul, Type en
+-- amarillo); los comentarios de la paleta documentan ese uso real.
 --
 -- Las integraciones de plugins viven en lua/lazarobox/integrations/. Fuera de
--- alcance: colores de terminal (catppuccin tampoco los pinta con term_colors=false).
+-- alcance: colores de terminal (catppuccin tampoco los pintaba: term_colors=false).
 
 local M = {}
 
@@ -17,8 +18,8 @@ local function hex_to_rgb(hex)
 end
 
 -- Mezcla lineal fg sobre bg: alpha 1 = fg, alpha 0 = bg. Es la misma formula
--- que usa catppuccin para sus darken/lighten, asi CursorLine, Search o los
--- fondos de diff salen al mismo hex sin tener que fijarlos a mano.
+-- que usaba catppuccin para sus darken/lighten, asi CursorLine, Search o los
+-- fondos de diff salieron al mismo hex sin tener que fijarlos a mano.
 function M.blend(fg, bg, alpha)
 	local fr, fgc, fb = hex_to_rgb(fg)
 	local br, bgc, bb = hex_to_rgb(bg)
@@ -115,7 +116,7 @@ local function editor(c, o)
 end
 
 -- Estilos: cursiva en comentarios, condicionales, funciones, variables y
--- booleanos; keywords y tipos rectos, igual que en lua/plugins/catppuccin.lua.
+-- booleanos; keywords y tipos rectos, como estaba configurado catppuccin.
 local function syntax(c)
 	return {
 		Comment = { fg = c.fg_muted, italic = true },
@@ -297,7 +298,7 @@ local function treesitter(c)
 		["@comment.warning"] = { fg = c.bg, bg = c.yellow },
 		["@comment.hint"] = { fg = c.bg, bg = c.blue },
 		["@comment.todo"] = { fg = c.bg, bg = c.coral },
-		-- catppuccin sobrescribe note con hint en su bloque de alias legacy
+		-- catppuccin sobrescribia note con hint en su bloque de alias legacy
 		["@comment.note"] = { fg = c.bg, bg = c.blue },
 
 		["@markup"] = { fg = c.fg },
@@ -336,7 +337,7 @@ local function treesitter(c)
 
 		["@error"] = { link = "Error" },
 
-		-- Ajustes por lenguaje que catppuccin trae de serie
+		-- Ajustes por lenguaje heredados de los que catppuccin traia de serie
 		["@function.builtin.bash"] = { fg = c.rose, italic = true },
 		["@variable.parameter.bash"] = { fg = c.green },
 		["@constructor.lua"] = { link = "@punctuation.bracket" },
@@ -414,8 +415,8 @@ end
 -- Capturas treesitter renombradas en nvim 0.10 -> su nombre moderno. Se
 -- mantienen porque aun hay quien las pide: noice pinta la documentacion LSP con
 -- @text.title, @text.reference y @parameter. Son copias, no links, igual que
--- en catppuccin, para que el resultado resuelto sea identico. @text.uri no
--- esta: catppuccin lo apunta a @markup.link.uri, que no existe, y queda vacio.
+-- en catppuccin, para que el resultado resuelto fuera identico. @text.uri no
+-- esta: catppuccin lo apuntaba a @markup.link.uri, que no existe, y quedaba vacio.
 local LEGACY_CAPTURES = {
 	["@parameter"] = "@variable.parameter",
 	["@field"] = "@variable.member",
@@ -456,7 +457,7 @@ local LEGACY_CAPTURES = {
 	["@type.qualifier"] = "@keyword.modifier",
 	["@define"] = "@keyword.directive.define",
 	["@preproc"] = "@keyword.directive",
-	-- catppuccin encadena @storageclass -> @keyword.storage -> @keyword.modifier
+	-- catppuccin encadenaba @storageclass -> @keyword.storage -> @keyword.modifier
 	["@storageclass"] = "@keyword.modifier",
 	["@conditional"] = "@keyword.conditional",
 	["@exception"] = "@keyword.exception",

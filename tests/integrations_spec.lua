@@ -7,7 +7,7 @@ local function is_color(v)
 end
 
 -- Grupos clave por integracion: si falta alguno, el plugin cae a sus propios
--- defaults y el cambio desde catppuccin dejaria de ser invisible.
+-- defaults y el tema dejaria de verse como cuando lo pintaba catppuccin.
 local REQUIRED = {
 	gitsigns = {
 		"GitSignsAdd", "GitSignsChange", "GitSignsDelete", "GitSignsCurrentLineBlame",
@@ -120,7 +120,7 @@ describe("theme.groups capturas legacy", function()
 		end)
 	end
 
-	it("@type.qualifier enlaza a Keyword como en catppuccin", function()
+	it("@type.qualifier enlaza a Keyword como hacia catppuccin", function()
 		assert_eq(g["@keyword.modifier"], g["@type.qualifier"])
 	end)
 end)
