@@ -3,6 +3,8 @@ return {
 	name = "catppuccin",
 	priority = 1000,
 	config = function()
+		local palette = require("lazarobox.palette")
+
 		require("catppuccin").setup({
 			flavour = "auto", -- latte, frappe, macchiato, mocha
 			background = { -- :h background
@@ -58,45 +60,9 @@ return {
 					background = true,
 				},
 			},
-			-- Kanagawa Blur palette mapped to Catppuccin tokens
-			-- Based on: github.com/Gentleman-Programming/gentleman-kanagawa-blur (blur variant)
+			-- La paleta vive en lua/lazarobox/palette.lua; aqui solo se traduce a tokens de Catppuccin
 			color_overrides = {
-				all = {
-					-- Backgrounds
-					base = "#191E28", -- gray1 — main background
-					mantle = "#191E28", -- gray1 — sidebar / statusline bg
-					crust = "#232A40", -- gray2 — borders
-
-					-- Surfaces
-					surface0 = "#1C212C", -- surface0
-					surface1 = "#232A36", -- surface1
-					surface2 = "#2A3142", -- surface2
-
-				-- Text
-				text = "#F3F6F9", -- fg
-				subtext1 = "#00FFFF", -- bright_black / fg_placeholder
-				subtext0 = "#8892A4", -- gray5 / fg_muted — raised for contrast on dark bg
-
-				-- Overlays (selection, inactive text, borders)
-				overlay2 = "#8892A4", -- gray5 — raised for contrast on dark bg
-				overlay1 = "#5A6480", -- gray3 — raised for contrast on dark bg
-				overlay0 = "#3D4F7A", -- gray4 — raised for contrast on dark bg
-
-					-- Accent colors (syntax)
-					red = "#CB7C94", -- constant / embedded
-					flamingo = "#C4746E", -- variable
-					pink = "#B99BF2", -- function_
-					mauve = "#C99AD6", -- keyword
-					blue = "#7FB4CA", -- blue / type
-					sapphire = "#A3B5D6", -- constructor / primary
-					sky = "#7AA89F", -- cyan
-					teal = "#A4DAA7", -- number / enum
-					green = "#B7CC85", -- green
-					yellow = "#FFE066", -- yellow / warnings
-					peach = "#DEBA87", -- operator / orange
-					lavender = "#B4BEFE", -- identifiers / selection highlight — original Catppuccin Mocha lavender
-					rosewater = "#E0C15A", -- accent (gold)
-				},
+				all = palette.to_catppuccin(palette.colors),
 			},
 			custom_highlights = {},
 			default_integrations = true,
