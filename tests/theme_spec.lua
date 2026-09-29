@@ -152,3 +152,20 @@ describe("colors/lazarobox.lua", function()
 		assert_eq(tonumber(palette.colors.fg:sub(2), 16), normal.fg)
 	end)
 end)
+
+-- syntax/csv.vim del runtime colorea cada columna con csvCol0..8 (sin
+-- treesitter para csv). catppuccin los pinta en arcoiris; si faltan, las
+-- columnas salen con los links por defecto del runtime.
+describe("theme.groups csv", function()
+	local g = theme.groups(palette.colors)
+	local c = palette.colors
+	it("columnas csv en arcoiris", function()
+		local expected = { c.rose, c.sand, c.yellow, c.green, c.aqua, c.blue, c.lavender, c.orchid, c.violet }
+		for i, color in ipairs(expected) do
+			assert_eq({ fg = color }, g["csvCol" .. (i - 1)], "csvCol" .. (i - 1))
+		end
+	end)
+	it("escCsvCol0 enlaza a csvCol0", function()
+		assert_eq({ link = "csvCol0" }, g.escCsvCol0)
+	end)
+end)

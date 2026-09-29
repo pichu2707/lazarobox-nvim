@@ -5,9 +5,8 @@
 -- colores de cada grupo siguen el mapeo de catppuccin (p.ej. Function en azul,
 -- Type en amarillo); los comentarios de la paleta documentan ese uso real.
 --
--- Fuera de alcance aqui: integraciones de plugins (cmp, gitsigns, nvim-tree,
--- mini...) y colores de terminal. Siguen viniendo de catppuccin, que es el
--- tema por defecto.
+-- Las integraciones de plugins viven en lua/lazarobox/integrations/. Fuera de
+-- alcance: colores de terminal (catppuccin tampoco los pinta con term_colors=false).
 
 local M = {}
 
@@ -157,6 +156,18 @@ local function syntax(c)
 		Todo = { fg = c.bg, bg = c.coral, bold = true },
 		qfLineNr = { fg = c.yellow },
 		qfFileName = { fg = c.blue },
+
+		-- syntax/csv.vim del runtime: una columna por color para seguirlas a ojo
+		csvCol0 = { fg = c.rose },
+		csvCol1 = { fg = c.sand },
+		csvCol2 = { fg = c.yellow },
+		csvCol3 = { fg = c.green },
+		csvCol4 = { fg = c.aqua },
+		csvCol5 = { fg = c.blue },
+		csvCol6 = { fg = c.lavender },
+		csvCol7 = { fg = c.orchid },
+		csvCol8 = { fg = c.violet },
+		escCsvCol0 = { link = "csvCol0" },
 
 		-- Titulos en arcoiris que reutilizan markdown y treesitter
 		rainbow1 = { fg = c.rose },
@@ -400,13 +411,80 @@ local function lsp(c, o)
 	return groups
 end
 
+-- Capturas treesitter renombradas en nvim 0.10 -> su nombre moderno. Se
+-- mantienen porque aun hay quien las pide: noice pinta la documentacion LSP con
+-- @text.title, @text.reference y @parameter. Son copias, no links, igual que
+-- en catppuccin, para que el resultado resuelto sea identico. @text.uri no
+-- esta: catppuccin lo apunta a @markup.link.uri, que no existe, y queda vacio.
+local LEGACY_CAPTURES = {
+	["@parameter"] = "@variable.parameter",
+	["@field"] = "@variable.member",
+	["@namespace"] = "@module",
+	["@float"] = "@number.float",
+	["@symbol"] = "@string.special.symbol",
+	["@symbol.ruby"] = "@string.special.symbol.ruby",
+	["@string.regex"] = "@string.regexp",
+	["@text"] = "@markup",
+	["@text.strong"] = "@markup.strong",
+	["@text.emphasis"] = "@markup.italic",
+	["@text.underline"] = "@markup.underline",
+	["@text.strike"] = "@markup.strikethrough",
+	["@text.math"] = "@markup.math",
+	["@text.environment"] = "@markup.environment",
+	["@text.environment.name"] = "@markup.environment.name",
+	["@text.title"] = "@markup.heading",
+	["@text.title.1.markdown"] = "@markup.heading.1.markdown",
+	["@text.title.2.markdown"] = "@markup.heading.2.markdown",
+	["@text.title.3.markdown"] = "@markup.heading.3.markdown",
+	["@text.title.4.markdown"] = "@markup.heading.4.markdown",
+	["@text.title.5.markdown"] = "@markup.heading.5.markdown",
+	["@text.title.6.markdown"] = "@markup.heading.6.markdown",
+	["@text.literal"] = "@markup.raw",
+	["@text.reference"] = "@markup.link",
+	["@text.todo"] = "@comment.todo",
+	["@text.todo.checked"] = "@markup.list.checked",
+	["@text.todo.unchecked"] = "@markup.list.unchecked",
+	["@text.warning"] = "@comment.warning",
+	["@text.note"] = "@comment.note",
+	["@text.danger"] = "@comment.error",
+	["@text.diff.add"] = "@diff.plus",
+	["@text.diff.delete"] = "@diff.minus",
+	["@method"] = "@function.method",
+	["@method.call"] = "@function.method.call",
+	["@method.php"] = "@function.method.php",
+	["@method.call.php"] = "@function.method.call.php",
+	["@type.qualifier"] = "@keyword.modifier",
+	["@define"] = "@keyword.directive.define",
+	["@preproc"] = "@keyword.directive",
+	-- catppuccin encadena @storageclass -> @keyword.storage -> @keyword.modifier
+	["@storageclass"] = "@keyword.modifier",
+	["@conditional"] = "@keyword.conditional",
+	["@exception"] = "@keyword.exception",
+	["@include"] = "@keyword.import",
+	["@repeat"] = "@keyword.repeat",
+}
+
 -- Devuelve { [grupo] = spec } listo para nvim_set_hl. Pura: no toca Neovim.
 function M.groups(colors, opts)
 	local o = vim.tbl_extend("force", { transparent = true }, opts or {})
 	local result = {}
-	for _, section in ipairs({ editor(colors, o), syntax(colors), diff(colors), treesitter(colors), lsp(colors, o) }) do
+	local sections = {
+		editor(colors, o),
+		syntax(colors),
+		diff(colors),
+		treesitter(colors),
+		lsp(colors, o),
+		require("lazarobox.integrations").groups(colors, o),
+	}
+	for _, section in ipairs(sections) do
 		for name, spec in pairs(section) do
 			result[name] = spec
+		end
+	end
+	for legacy, modern in pairs(LEGACY_CAPTURES) do
+		-- Copia defensiva: compartir la tabla haria que editar una alterase la otra
+		if result[modern] then
+			result[legacy] = vim.deepcopy(result[modern])
 		end
 	end
 	return result
