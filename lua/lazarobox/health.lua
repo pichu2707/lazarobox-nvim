@@ -397,13 +397,24 @@ local function check_clipboard()
 		return
 	end
 
+	-- Proveedor elegido de verdad por lazarobox.clipboard (puede diferir de lo instalado)
+	local selected = vim.g.clipboard and vim.g.clipboard.name
+	if selected then
+		health.info("Proveedor activo: " .. selected)
+	end
+
 	if is_wsl() then
 		if has("win32yank.exe") then
 			health.ok("win32yank.exe (portapapeles compartido con Windows)")
+		elseif has("clip.exe") and has("powershell.exe") then
+			-- Funciona, pero cada pegado arranca PowerShell y tarda algo mas
+			health.warn("Usando clip.exe/powershell.exe como respaldo (sin win32yank.exe)", {
+				"El portapapeles se comparte con Windows, pero pegar es mas lento",
+				"Ejecuta ./install.sh para instalar win32yank.exe, la opcion mas rapida",
+			})
 		else
-			health.warn("win32yank.exe no encontrado", {
-				"lua/config/options.lua lo usa para compartir portapapeles con Windows",
-				"Ejecuta ./install.sh para instalarlo en /usr/local/bin",
+			health.error("Sin win32yank.exe ni clip.exe/powershell.exe", {
+				"Ejecuta ./install.sh para instalar win32yank.exe en /usr/local/bin",
 			})
 		end
 		return
