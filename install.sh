@@ -265,13 +265,23 @@ as_root() {
 
 install_deps_apt() {
 	info "Usando apt"
+	# El nodejs de NodeSource ya trae npm y choca con el paquete npm de Ubuntu:
+	# solo pedimos node/npm a apt si no estan ya disponibles.
+	local node_pkgs=()
+	if ! has node || ! has npm; then
+		if dpkg-query -W -f='${Version}' nodejs 2>/dev/null | grep -q nodesource; then
+			node_pkgs=(nodejs)
+		else
+			node_pkgs=(nodejs npm)
+		fi
+	fi
 	as_root apt-get update -qq
 	as_root apt-get install -y --no-install-recommends \
 		git curl unzip fontconfig build-essential \
 		ripgrep fd-find imagemagick chafa \
 		xclip wl-clipboard \
 		python3 python3-venv python3-pip \
-		nodejs npm
+		"${node_pkgs[@]}"
 	ok "Paquetes apt instalados"
 }
 
