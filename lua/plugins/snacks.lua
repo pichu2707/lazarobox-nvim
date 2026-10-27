@@ -72,7 +72,20 @@ return {
 		explorer = { enabled = true },
 		indent = { enabled = true },
 		input = { enabled = true },
-		picker = { enabled = true },
+		picker = {
+			enabled = true,
+			sources = {
+				-- Dotfiles visible; gitignored files stay hidden except env files
+				explorer = { hidden = true, include = { ".env*" } },
+				-- The files picker has no `include`, so show ignored files and drop the noise
+				files = {
+					hidden = true,
+					ignored = true,
+					exclude = { ".git", "node_modules", "dist", "build", "target", ".venv", "__pycache__" },
+				},
+				grep = { hidden = true },
+			},
+		},
 		notifier = { enabled = true },
 		scope = { enabled = true },
 		scroll = { enabled = true },
