@@ -596,22 +596,16 @@ link_config() {
 	ok "Enlazado $REPO_DIR -> $nvim_config"
 }
 
-install_git_hooks() {
-	step "Git hooks"
+# Versioning used to run in a local post-commit hook installed by this script.
+# It now runs in GitHub Actions (.github/workflows/version.yml), so a leftover
+# copy would bump VERSION twice. Remove it, but only if it is ours.
+remove_legacy_version_hook() {
+	local hook="$REPO_DIR/.git/hooks/post-commit"
 
-	if [[ ! -d "$REPO_DIR/.git" ]]; then
-		skip "No es un clon de git: no hay hooks que instalar"
-		return
-	fi
-	if [[ ! -x "$REPO_DIR/scripts/install-hooks.sh" ]]; then
-		skip "scripts/install-hooks.sh no disponible"
-		return
-	fi
-
-	if "$REPO_DIR/scripts/install-hooks.sh" >/dev/null; then
-		ok "Hooks instalados"
-	else
-		warn "No he podido instalar los git hooks; ejecuta scripts/install-hooks.sh a mano"
+	if [[ -L "$hook" && "$(readlink "$hook")" == */scripts/git-hooks/post-commit ]] ||
+		{ [[ -f "$hook" ]] && grep -q 'bump(version):' "$hook"; }; then
+		rm -f "$hook"
+		ok "Removed the legacy versioning hook (versioning now runs in GitHub Actions)"
 	fi
 }
 
@@ -747,7 +741,7 @@ main() {
 	install_deps
 	install_fonts
 	link_config
-	install_git_hooks
+	remove_legacy_version_hook
 	summary
 }
 

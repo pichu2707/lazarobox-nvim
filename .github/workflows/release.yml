@@ -10,6 +10,15 @@ on:
         description: "Tag to preview notes for. Defaults to the most recent tag. Nothing is published."
         required: false
         type: string
+  # Called by version.yml right after it tags a release. Tags pushed with
+  # GITHUB_TOKEN never trigger the `push: tags` event above, so the version
+  # workflow has to invoke this one explicitly.
+  workflow_call:
+    inputs:
+      tag:
+        description: "Tag to publish a release for."
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -33,12 +42,25 @@ jobs:
           # inside run: would let the input inject shell.
           INPUT_TAG: ${{ inputs.tag }}
         run: |
-          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
-            tag="${GITHUB_REF_NAME}"
+          # Under workflow_call, GITHUB_EVENT_NAME is the CALLER's event (a
+          # push to main), so it cannot tell a call from a tag push. The tag
+          # input can: it is required on workflow_call and absent on push.
+          if [ "${GITHUB_EVENT_NAME}" = "workflow_dispatch" ]; then
+            publish=false
+            if [ -n "${INPUT_TAG}" ]; then
+              tag="${INPUT_TAG}"
+            else
+              tag="$(git describe --tags --abbrev=0)"
+            fi
           elif [ -n "${INPUT_TAG}" ]; then
+            publish=true
             tag="${INPUT_TAG}"
+          elif [ "${GITHUB_EVENT_NAME}" = "push" ] && [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            publish=true
+            tag="${GITHUB_REF_NAME}"
           else
-            tag="$(git describe --tags --abbrev=0)"
+            echo "::error::Cannot resolve a tag for event ${GITHUB_EVENT_NAME} on ${GITHUB_REF}."
+            exit 1
           fi
 
           if ! git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
@@ -47,11 +69,13 @@ jobs:
           fi
 
           echo "tag=${tag}" >> "$GITHUB_OUTPUT"
-          echo "Resolved tag: ${tag}"
+          echo "publish=${publish}" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: ${tag} (publish: ${publish})"
 
       - name: Verify VERSION matches the tag
         env:
           TAG: ${{ steps.resolve.outputs.tag }}
+          PUBLISH: ${{ steps.resolve.outputs.publish }}
         run: |
           want="${TAG#v}"
           # Read VERSION out of the tag's own tree. On workflow_dispatch the
@@ -60,7 +84,7 @@ jobs:
 
           if [ "$want" = "$got" ]; then
             echo "VERSION file and tag agree on ${got}."
-          elif [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+          elif [ "${PUBLISH}" = "true" ]; then
             echo "::error::Tag ${TAG} does not match its VERSION file (${got}). Bump VERSION before tagging."
             exit 1
           else
@@ -127,8 +151,9 @@ jobs:
       - name: Show the notes in the run summary
         env:
           TAG: ${{ steps.resolve.outputs.tag }}
+          PUBLISH: ${{ steps.resolve.outputs.publish }}
         run: |
-          if [ "${GITHUB_EVENT_NAME}" = "push" ]; then
+          if [ "${PUBLISH}" = "true" ]; then
             printf '# Release %s\n\n' "${TAG}" >> "$GITHUB_STEP_SUMMARY"
           else
             printf '# Preview of %s\n\n_Dry run: nothing was published._\n\n' "${TAG}" >> "$GITHUB_STEP_SUMMARY"
@@ -136,7 +161,7 @@ jobs:
           cat "${RUNNER_TEMP}/notes.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create the release
-        if: github.event_name == 'push'
+        if: steps.resolve.outputs.publish == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.resolve.outputs.tag }}
@@ -147,5 +172,5 @@ jobs:
             --verify-tag
 
       - name: Dry run notice
-        if: github.event_name != 'push'
+        if: steps.resolve.outputs.publish != 'true'
         run: echo "::notice::Preview only — no release was created. Push the tag to publish."

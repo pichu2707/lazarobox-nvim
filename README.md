@@ -54,7 +54,7 @@ See [`ATAJOS_EJECUTAR_CODIGO.md`](./ATAJOS_EJECUTAR_CODIGO.md) for the current k
 | Dependencies | `ripgrep`, `fd`, `imagemagick`, `chafa`, `node`, a C compiler — detected via apt, pacman, dnf, zypper, brew or winget |
 | Clipboard | `xclip` on X11, `wl-clipboard` on Wayland, `win32yank.exe` on WSL, native on macOS |
 | Config | Links the repository into `~/.config/nvim` (`%LOCALAPPDATA%\nvim` on Windows), backing up anything already there |
-| Git hooks | Installs the versioning hook — `scripts/install-hooks.sh` on Linux/macOS, copied into `.git/hooks` on Windows |
+| Legacy hook | Removes the old local versioning hook if a previous install left it in `.git/hooks` |
 
 The installer is **idempotent** — re-running it skips whatever is already in place, so
 it is safe to use to repair a broken setup.
@@ -62,8 +62,10 @@ it is safe to use to repair a broken setup.
 ### Automatic versioning
 
 This repository versions itself from [Conventional Commits](https://www.conventionalcommits.org/).
-A git hook reads each commit message on `main` and, when it matches, bumps `VERSION`
-and tags the release — no manual `npm version` or changelog editing.
+On every push or merge to `main`, the [`Version`](.github/workflows/version.yml) workflow
+reads the commits since the latest `v*` tag, bumps `VERSION`, commits
+`bump(version): vX.Y.Z` as `github-actions[bot]`, tags `vX.Y.Z` and publishes the
+GitHub release — no manual `npm version` or changelog editing.
 
 | Commit type | Bump |
 | --- | --- |
@@ -72,17 +74,18 @@ and tags the release — no manual `npm version` or changelog editing.
 | Any type marked breaking (`feat!:`, `fix!:`) or a `BREAKING CHANGE:` footer | Major |
 | Anything else (`docs`, `chore`, `ci`, `test`, `style`, `refactor`, …) | No bump |
 
-The hook only runs on `main`, so committing to a feature branch never tags anything.
-`BREAKING CHANGE:` counts only as a real footer at the start of a line — mentioning
-the phrase in prose does not trigger a major bump.
+When a push carries several commits, the highest bump wins. Only the subject decides
+the type, and `BREAKING CHANGE:` counts only as a real footer at the start of a line —
+mentioning the phrase in prose does not trigger a major bump. The decision lives in
+[`scripts/next-version.sh`](scripts/next-version.sh), covered by `tests/next_version_spec.lua`.
 
-The installers set up this hook for you (see the table above). If you already have
-the repo cloned and skipped the installer — or the hook needs reinstalling — run it
-by hand:
-
-```bash
-./scripts/install-hooks.sh
-```
+- **Contributors:** give your pull request a Conventional Commit title (`feat(ui): …`,
+  `fix: …`). Commits on feature branches and forks never bump anything.
+- **Maintainers:** squash-merge, so the PR title becomes the commit subject on `main`.
+  After a release, run `git pull` to fetch the bump commit and tag before your next change.
+- **Branch protection:** the workflow pushes to `main` with `GITHUB_TOKEN`. If `main`
+  requires pull requests or status checks, allow GitHub Actions to bypass those rules,
+  or the bump push will be rejected and no release will be published.
 
 ### Options
 

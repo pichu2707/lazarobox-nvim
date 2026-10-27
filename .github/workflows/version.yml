@@ -1,0 +1,94 @@
+name: Version
+
+# Bumps VERSION and tags a release from the Conventional Commits merged into
+# main. Runs only on pushes to main of this repository: never on pull_request
+# or pull_request_target, so fork code is never checked out with a write token.
+on:
+  push:
+    branches:
+      - main
+
+# Nothing by default; the jobs below opt into exactly what they need.
+permissions: {}
+
+# Two merges in quick succession must not race to push the same tag. Runs are
+# queued, never cancelled mid-push, and each one works from the latest main.
+concurrency:
+  group: version-main
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    name: Bump version and tag
+    # The bot's own bump commit must never bump again. (Pushes made with
+    # GITHUB_TOKEN do not trigger workflows anyway; this guards manual pushes.)
+    if: ${{ !startsWith(github.event.head_commit.message, 'bump(version):') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      tag: ${{ steps.bump.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # The branch tip, not github.sha: a queued run must build on top of
+          # the bump commit a previous run may have pushed, or its push would
+          # be rejected as non-fast-forward.
+          ref: main
+          # Full history and tags: the range starts at the latest v* tag.
+          fetch-depth: 0
+
+      - name: Compute the next version
+        id: bump
+        run: |
+          last_tag="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+          range="${last_tag:+${last_tag}..}HEAD"
+          current="$(tr -d '[:space:]' < VERSION)"
+          echo "Current VERSION: ${current}; commits in ${range}:"
+          git log --oneline "${range}"
+
+          next="$(git log --format='%B%x00' "${range}" | scripts/next-version.sh "${current}")"
+
+          if [ -z "${next}" ]; then
+            echo "No releasable commits since ${last_tag:-the first commit}."
+            echo "tag=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          tag="v${next}"
+          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            echo "::error::Tag ${tag} already exists. Fix VERSION or the tags before releasing."
+            exit 1
+          fi
+
+          echo "next=${next}" >> "$GITHUB_OUTPUT"
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+          echo "Next version: ${next}"
+
+      - name: Commit, tag and push
+        if: steps.bump.outputs.tag != ''
+        env:
+          NEXT: ${{ steps.bump.outputs.next }}
+          TAG: ${{ steps.bump.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          echo "${NEXT}" > VERSION
+          git add VERSION
+          git commit -m "bump(version): ${TAG}"
+          git tag -a "${TAG}" -m "${TAG}"
+
+          # --atomic: either both the commit and the tag land, or neither does.
+          git push --atomic origin HEAD:refs/heads/main "refs/tags/${TAG}"
+
+  release:
+    name: Publish release
+    needs: bump
+    if: needs.bump.outputs.tag != ''
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.bump.outputs.tag }}
